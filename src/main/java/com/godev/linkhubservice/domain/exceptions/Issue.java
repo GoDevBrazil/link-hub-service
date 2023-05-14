@@ -8,9 +8,9 @@ import java.util.List;
 public class Issue {
 
     private final String message;
-    private final List<Object> details;
+    private final List<String> details;
 
-    public Issue(IssueEnum issueEnum, List<Object> details) {
+    public Issue(IssueEnum issueEnum, List<String> details) {
         this.message = issueEnum.getMessage();
         this.details = details;
     }

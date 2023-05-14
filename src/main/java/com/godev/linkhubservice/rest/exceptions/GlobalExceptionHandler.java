@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Collections;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,7 +19,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Issue handlerMethodArgumentNotValidException(MethodArgumentNotValidException e){
         return new Issue(IssueEnum.ARGUMENT_NOT_VALID,
-                Collections.singletonList(e.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList()));
+                e.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
