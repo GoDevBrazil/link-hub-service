@@ -1,16 +1,20 @@
 package com.godev.linkhubservice.domain.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.domain.services.AccountService;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import org.apache.commons.lang3.ObjectUtils;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+
+import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_EXISTS_ERROR;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -25,7 +29,9 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponse register(AccountRequest accountRequest) {
 
         if(this.accountExists(accountRequest.getEmail())) {
-            throw new IllegalArgumentException("Email já cadastrado.");
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, accountRequest.getEmail()))
+            );
         }
 
         var account = Account
