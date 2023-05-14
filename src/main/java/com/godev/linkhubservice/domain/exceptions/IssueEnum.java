@@ -1,8 +1,8 @@
 package com.godev.linkhubservice.domain.exceptions;
 
 public enum IssueEnum {
-    ARGUMENT_NOT_VALID("An error has occurred while validate the request body."),
-    FORMAT_REQUEST_NOT_VALID("The request format is not supported.");
+    ARGUMENT_NOT_VALID("Um erro aconteceu durante a validação do corpo da requisição."),
+    FORMAT_REQUEST_NOT_VALID("O formato da requisição não é suportado.");
 
     private final String message;
 

@@ -15,20 +15,17 @@ import org.hibernate.validator.constraints.Length;
 @Builder(setterPrefix = "with")
 public class AccountRequest {
 
-    @Length(min = 4, max = 20, message = "The username field must have between 4 and 20 characters")
-    @NotBlank(message = "The username field is required!")
+    @Length(min = 4, max = 20, message = "O campo nome precisa ter entre 4 e 20 caracteres.")
+    @NotBlank(message = "O campo nome é obrigatório!")
     private String name;
 
-    @Length(min = 6, max = 50, message = "The email field must have between 6 and 50 characters")
-//    @NotBlank(message = "The email field is required!")
-    @Pattern(regexp = "/^[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/",
-            message = "que email é esse rapaz?")
+    @Length(min = 6, max = 50, message = "O campo email precisa ter entre 6 e 50 caracteres.")
+    @Pattern(regexp = "^[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+            message = "O campo email é precisa ser preenchido com um e-mail no formato válido")
     private String email;
 
-//    @Length(min = 8, max = 16, message = "The password field must have between 8 and 16 characters")
-//    @NotBlank(message = "The password field is required!")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$",
-            message = "password must be min 8 and max 16 length containing atleast 1 uppercase, 1 lowercase, 1 special character and 1 digit ")
+            message = "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial.")
     private String password;
 
 }
