@@ -29,6 +29,7 @@ public class AccountRequest {
     private String email;
 
     @Schema(name = "password", defaultValue = "Makako@123", description = "Password of a person or business")
+    @NotBlank(message = "O campo nome é obrigatório!")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$",
             message = "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial.")
     private String password;

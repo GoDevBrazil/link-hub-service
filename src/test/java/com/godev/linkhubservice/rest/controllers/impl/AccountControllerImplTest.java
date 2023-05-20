@@ -61,6 +61,19 @@ class AccountControllerImplTest {
     }
 
     @Test
+    void shouldThrowBadRequestWhenNameFieldHasInvalidLength() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
+
+        mockMvc.perform(post("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome precisa ter entre 4 e 20 caracteres."))));
+
+    }
+
+    @Test
     void shouldThrowBadRequestWhenNameFieldIsInvalid() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidName().build();
@@ -109,6 +122,45 @@ class AccountControllerImplTest {
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo email precisa ter entre 6 e 50 caracteres."))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPasswordFieldIsNull() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
+
+        mockMvc.perform(post("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome é obrigatório!"))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPasswordFieldIsInvalid() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
+
+        mockMvc.perform(post("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial."))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPasswordFieldHasInvalidLength() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
+
+        mockMvc.perform(post("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial."))));
 
     }
 }

@@ -37,6 +37,13 @@ public class AccountRequestMockBuilder {
         return this;
     }
 
+    public AccountRequestMockBuilder withInvalidLengthName() {
+
+        this.accountRequest.setName("Je");
+
+        return this;
+    }
+
     public AccountRequestMockBuilder withNullEmail() {
 
         this.accountRequest.setEmail(null);
@@ -54,6 +61,27 @@ public class AccountRequestMockBuilder {
     public AccountRequestMockBuilder withInvalidLengthEmail() {
 
         this.accountRequest.setEmail("a@a.c");
+
+        return this;
+    }
+
+    public AccountRequestMockBuilder withNullPassword() {
+
+        this.accountRequest.setPassword(null);
+
+        return this;
+    }
+
+    public AccountRequestMockBuilder withInvalidPassword() {
+
+        this.accountRequest.setPassword("Senha12345");
+
+        return this;
+    }
+
+    public AccountRequestMockBuilder withInvalidLengthPassword() {
+
+        this.accountRequest.setPassword("S3nh@");
 
         return this;
     }
