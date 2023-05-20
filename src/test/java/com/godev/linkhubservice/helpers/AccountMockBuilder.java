@@ -18,12 +18,18 @@ public class AccountMockBuilder {
 
     public AccountMockBuilder mock() {
 
-        this.account.setId(1);
         this.account.setName("Kibe");
         this.account.setEmail("kibe@email.com");
         this.account.setPassword("Kibe@1234");
         this.account.setCreatedAt(OffsetDateTime.parse("2023-05-15T22:07:00Z"));
         this.account.setUpdatedAt(OffsetDateTime.parse("2023-05-15T22:07:00Z"));
+
+        return this;
+    }
+
+    public AccountMockBuilder withId() {
+
+        this.account.setId(1);
 
         return this;
     }

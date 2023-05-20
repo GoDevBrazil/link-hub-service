@@ -100,7 +100,7 @@ class AccountControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenEmailFieldIsInvalidLength() throws Exception {
+    void shouldThrowBadRequestWhenEmailFieldHasInvalidLength() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
 
