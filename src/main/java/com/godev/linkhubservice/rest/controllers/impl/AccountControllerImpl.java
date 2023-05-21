@@ -1,5 +1,6 @@
 package com.godev.linkhubservice.rest.controllers.impl;
 
+import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.InvalidJwtException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
@@ -49,10 +50,12 @@ public class AccountControllerImpl implements AccountController {
                     .build();
             return ResponseEntity.ok(tokenResponse);
 
+        } catch (BadRequestException e) {
+            throw e;
         } catch (Exception e) {
             throw new InvalidJwtException(
-                    new Issue(IssueEnum.HEADER_REQUIRED_ERROR,
-                            GENERATE_AUTH_TOKEN_ERROR));
+                    new Issue(IssueEnum.HEADER_REQUIRED_ERROR, GENERATE_AUTH_TOKEN_ERROR)
+            );
         }
     }
 }
