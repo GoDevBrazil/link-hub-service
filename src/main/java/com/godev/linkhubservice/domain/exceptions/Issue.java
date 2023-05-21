@@ -2,7 +2,6 @@ package com.godev.linkhubservice.domain.exceptions;
 
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
