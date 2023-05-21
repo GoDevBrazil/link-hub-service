@@ -5,7 +5,7 @@ import lombok.Getter;
 public class RuleViolationException extends RuntimeException {
 
     @Getter
-    private final Issue issue;
+    private final transient Issue issue;
 
     public RuleViolationException(Issue issue) {
         super(issue.getMessage());
