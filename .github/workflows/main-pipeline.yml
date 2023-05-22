@@ -8,6 +8,9 @@ on:
 env:
     AZURE_WEBAPP_NAME: tbd
     JAVA_VERSION: 17
+    MYSQL_CONNECT_STRING: ${{ secrets.MYSQL_CONNECT_STRING }}
+    MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+    MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
 
 jobs:
   build:
