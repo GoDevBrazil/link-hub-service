@@ -1,6 +1,7 @@
 package com.godev.linkhubservice.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ public class AuthRequest {
 
     @Schema(name = "email", defaultValue = "john.doe@email.com", description = "E-mail of a person or business")
     @Length(min = 6, max = 50, message = "O campo email precisa ter entre 6 e 50 caracteres.")
+    @NotBlank(message = "O campo email é obrigatório!")
     @Pattern(regexp = "^[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
             message = "O campo email é precisa ser preenchido com um e-mail no formato válido")
     private String email;
