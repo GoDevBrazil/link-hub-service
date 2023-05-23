@@ -6,13 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-    AZURE_WEBAPP_NAME: tbd
+    AZURE_WEBAPP_NAME: dev-linkhub
     JAVA_VERSION: 17
     MYSQL_CONNECT_STRING: ${{ secrets.MYSQL_CONNECT_STRING }}
     MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-    DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
-    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   build:
@@ -33,8 +31,8 @@ jobs:
       - name: 🔐 Docker Login
         uses: docker/login-action@v2.1.0
         with:
-          username:
-          password:
+          username: ${{ secrets.DOCKER_USER_NAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Create application container image
         uses: docker/build-push-action@v4.0.0
