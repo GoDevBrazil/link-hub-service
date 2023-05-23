@@ -42,4 +42,4 @@ jobs:
           push: true
           tags: |
             jecesario/link-hub-service:latest
-            jecesario/link-hub-service:v${{ github.rum_number }}
+            jecesario/link-hub-service:v${{ github.run_number }}
