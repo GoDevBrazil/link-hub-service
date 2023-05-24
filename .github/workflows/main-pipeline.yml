@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-    AZURE_WEBAPP_NAME: dev-linkhub
+    AZURE_WEBAPP_NAME: linkhub
     JAVA_VERSION: 17
     MYSQL_CONNECT_STRING: ${{ secrets.MYSQL_CONNECT_STRING }}
     MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
