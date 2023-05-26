@@ -22,6 +22,11 @@ import java.time.DateTimeException;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.GENERATE_AUTH_TOKEN_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -145,7 +150,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome é obrigatório!"))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha é obrigatório!"))));
 
     }
 
@@ -235,8 +240,72 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo email é obrigatório!"))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))));
 
     }
 
+    @Test
+    void shouldThrowBadRequestWhenAuthRequestEmailFieldIsInvalid() throws Exception {
+
+        final var authRequest = AuthRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
+
+        mockMvc.perform(post("/account/auth")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenAuthRequestEmailFieldHasInvalidLength() throws Exception {
+
+        final var authRequest = AuthRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
+
+        mockMvc.perform(post("/account/auth")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenAuthRequestPasswordFieldIsNull() throws Exception {
+
+        final var authRequest = AuthRequestMockBuilder.getBuilder().mock().withNullPassword().build();
+
+        mockMvc.perform(post("/account/auth")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenAuthRequestPasswordFieldIsInvalid() throws Exception {
+
+        final var authRequest = AuthRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
+
+        mockMvc.perform(post("/account/auth")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
+
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenAuthRequestPasswordFieldHasInvalidLength() throws Exception {
+
+        final var authRequest = AuthRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
+
+        mockMvc.perform(post("/account/auth")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
+
+    }
 }
