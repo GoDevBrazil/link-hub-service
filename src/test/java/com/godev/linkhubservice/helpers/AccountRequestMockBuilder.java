@@ -30,9 +30,9 @@ public class AccountRequestMockBuilder {
         return this;
     }
 
-    public AccountRequestMockBuilder withInvalidName() {
+    public AccountRequestMockBuilder withEmptyName() {
 
-        this.accountRequest.setName("Peu");
+        this.accountRequest.setName("");
 
         return this;
     }

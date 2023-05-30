@@ -5,3 +5,8 @@ spring:
     password: ${MYSQL_PASSWORD:}
   jpa:
     show-sql: true
+
+security:
+  jwt:
+    expiration: ${JWT_EXPIRATION:24}
+    signKey: ${JWT_SIGN_KEY:90b7f006669b4d898fdfaef655c89c7998fc5daea9c3c4c4019821b719f361ff929a43261e09f143a6f5ccade58db7d77ce663216acf7679fa2ad3c75216e02a}
