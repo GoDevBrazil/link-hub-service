@@ -10,6 +10,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import static com.godev.linkhubservice.domain.constants.RegexConstants.EMAIL_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.PASSWORD_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,21 +27,20 @@ import org.hibernate.validator.constraints.Length;
 public class AccountRequest {
 
     @Schema(name = "name", defaultValue = "John Doe", description = "Nome of a person or business")
-    @Length(min = 4, max = 20, message = "O campo nome precisa ter entre 4 e 20 caracteres.")
-    @NotBlank(message = "O campo nome é obrigatório!")
+    @Length(min = 4, max = 20, message = NAME_LENGTH_ERROR)
+    @NotBlank(message = NAME_REQUIRED_ERROR)
     private String name;
 
     @Schema(name = "email", defaultValue = "john.doe@email.com", description = "E-mail of a person or business")
-    @Length(min = 6, max = 50, message = "O campo email precisa ter entre 6 e 50 caracteres.")
-    @NotBlank(message = "O campo email é obrigatório!")
-    @Pattern(regexp = "^[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
-            message = "O campo email é precisa ser preenchido com um e-mail no formato válido.")
+    @Length(min = 6, max = 50, message = EMAIL_LENGTH_ERROR)
+    @NotBlank(message = EMAIL_REQUIRED_ERROR)
+    @Pattern(regexp = EMAIL_VALIDATION_REGEX, message = EMAIL_FORMAT_ERROR)
     private String email;
 
     @Schema(name = "password", defaultValue = "Makako@123", description = "Password of a person or business")
-    @NotBlank(message = "O campo nome é obrigatório!")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$",
-            message = "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial.")
+    @NotBlank(message = PASSWORD_REQUIRED_ERROR)
+    @Pattern(regexp = PASSWORD_VALIDATION_REGEX,
+            message = PASSWORD_FORMAT_ERROR)
     private String password;
 
 }

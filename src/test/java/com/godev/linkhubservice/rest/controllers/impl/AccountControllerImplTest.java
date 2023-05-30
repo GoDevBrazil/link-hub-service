@@ -19,12 +19,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.DateTimeException;
+import java.util.List;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.GENERATE_AUTH_TOKEN_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -72,7 +75,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome é obrigatório!"))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR))));
 
     }
 
@@ -85,20 +88,21 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome precisa ter entre 4 e 20 caracteres."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
 
     }
 
     @Test
-    void shouldThrowBadRequestWhenNameFieldIsInvalid() throws Exception {
+    void shouldThrowBadRequestWhenNameFieldIsEmpty() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidName().build();
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
 
         mockMvc.perform(post("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo nome precisa ter entre 4 e 20 caracteres."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR)))));
 
     }
 
@@ -111,7 +115,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo email é obrigatório!"))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))));
 
     }
 
@@ -124,7 +128,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo email é precisa ser preenchido com um e-mail no formato válido."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
 
     }
 
@@ -137,7 +141,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo email precisa ter entre 6 e 50 caracteres."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
 
     }
 
@@ -150,7 +154,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha é obrigatório!"))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR))));
 
     }
 
@@ -163,7 +167,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
 
     }
 
@@ -176,7 +180,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos uma letra maíúscula, uma minúscula, um número e um caractere especial."))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
 
     }
 
