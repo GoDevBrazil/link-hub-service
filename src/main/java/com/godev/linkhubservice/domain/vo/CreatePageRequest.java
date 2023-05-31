@@ -3,23 +3,17 @@ package com.godev.linkhubservice.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import static com.godev.linkhubservice.domain.constants.RegexConstants.EMAIL_VALIDATION_REGEX;
-import static com.godev.linkhubservice.domain.constants.RegexConstants.PASSWORD_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_TYPE_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_VALUE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.FONT_COLOR_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PHOTO_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
@@ -43,26 +37,20 @@ public class CreatePageRequest {
     @Length(min = 20, max = 200, message = DESCRIPTION_LENGTH_ERROR)
     private String description;
 
+    @Schema(name = "photo", defaultValue = "Link hub page photo.", description = "A photo of the page")
+    @Length(min = 20, max = 100, message = PHOTO_LENGTH_ERROR)
     private String photo;
+
+    @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
+    @Length(min = 2, max = 7, message = FONT_COLOR_LENGTH_ERROR)
     private String fontColor;
+
+    @Schema(name = "background type", defaultValue = "color", description = "A background type of the page")
+    @Length(min = 2, max = 5, message = BACKGROUND_TYPE_LENGTH_ERROR)
     private String backgroundType;
+
+    @Schema(name = "background value", defaultValue = "#F4F4F4", description = "A background color of the page")
+    @Length(min = 2, max = 50, message = BACKGROUND_VALUE_LENGTH_ERROR)
     private String backgroundValue;
-
-    @Schema(name = "name", defaultValue = "John Doe", description = "Nome of a person or business")
-    @Length(min = 4, max = 20, message = NAME_LENGTH_ERROR)
-    @NotBlank(message = NAME_REQUIRED_ERROR)
-    private String name;
-
-    @Schema(name = "email", defaultValue = "john.doe@email.com", description = "E-mail of a person or business")
-    @Length(min = 6, max = 50, message = EMAIL_LENGTH_ERROR)
-    @NotBlank(message = EMAIL_REQUIRED_ERROR)
-    @Pattern(regexp = EMAIL_VALIDATION_REGEX, message = EMAIL_FORMAT_ERROR)
-    private String email;
-
-    @Schema(name = "password", defaultValue = "Makako@123", description = "Password of a person or business")
-    @NotBlank(message = PASSWORD_REQUIRED_ERROR)
-    @Pattern(regexp = PASSWORD_VALIDATION_REGEX,
-            message = PASSWORD_FORMAT_ERROR)
-    private String password;
 
 }
