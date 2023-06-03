@@ -1,5 +1,9 @@
 package com.godev.linkhubservice.domain.services.impl;
 
+import com.godev.linkhubservice.domain.enums.BackgroundType;
+import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.domain.repository.PageRepository;
@@ -12,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+
+import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 
 @Service
 public class PageServiceImpl implements PageService {
@@ -30,6 +36,13 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = accountRepository.findByEmail(userDetails.getUsername());
 
+        this.pageRepository.findBySlug(createPageRequest.getSlug())
+                .ifPresent(page -> {
+                    throw new RuleViolationException(
+                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
+                    );
+                });
+
         var page = Page
                 .builder()
                 .withAccount(account.get())
@@ -38,7 +51,7 @@ public class PageServiceImpl implements PageService {
                 .withDescription(createPageRequest.getDescription())
                 .withPhoto(createPageRequest.getPhoto())
                 .withFontColor(createPageRequest.getFontColor())
-                .withBackgroundType(createPageRequest.getBackgroundType())
+                .withBackgroundType(createPageRequest.getBackgroundType().toString())
                 .withBackgroundValue(createPageRequest.getBackgroundValue())
                 .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
@@ -54,7 +67,7 @@ public class PageServiceImpl implements PageService {
                 .withDescription(pageSaved.getDescription())
                 .withPhoto(pageSaved.getPhoto())
                 .withFontColor(pageSaved.getFontColor())
-                .withBackgroundType(pageSaved.getBackgroundType())
+                .withBackgroundType(BackgroundType.valueOf(pageSaved.getBackgroundType()))
                 .withBackgroundValue(pageSaved.getBackgroundValue())
                 .withCreatedAt(pageSaved.getCreatedAt())
                 .withUpdatedAt(pageSaved.getUpdatedAt())
