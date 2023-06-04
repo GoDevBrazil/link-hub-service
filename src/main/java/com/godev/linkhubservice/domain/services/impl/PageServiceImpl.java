@@ -10,6 +10,7 @@ import com.godev.linkhubservice.domain.services.AccountService;
 import com.godev.linkhubservice.domain.services.PageService;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,10 @@ public class PageServiceImpl implements PageService {
                             new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
                     );
                 });
+
+        if(ObjectUtils.isEmpty(createPageRequest.getPhoto())){
+            createPageRequest.setPhoto("avatar.png");
+        }
 
         var page = Page
                 .builder()

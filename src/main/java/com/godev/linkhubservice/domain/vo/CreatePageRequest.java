@@ -3,12 +3,15 @@ package com.godev.linkhubservice.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_URL_ERROR;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_TYPE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_VALUE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
@@ -39,6 +42,7 @@ public class CreatePageRequest {
 
     @Schema(name = "photo", defaultValue = "Link hub page photo.", description = "A photo of the page")
     @Length(min = 20, max = 100, message = PHOTO_LENGTH_ERROR)
+    @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_ERROR)
     private String photo;
 
     @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
