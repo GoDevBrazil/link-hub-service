@@ -1,9 +1,7 @@
 package com.godev.linkhubservice.domain.vo;
 
 
-import com.godev.linkhubservice.domain.enums.BackgroundType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_TYPE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_VALUE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.FONT_COLOR_LENGTH_ERROR;
@@ -47,8 +46,8 @@ public class CreatePageRequest {
     private String fontColor;
 
     @Schema(name = "background type", defaultValue = "color", description = "A background type of the page")
-    @Nullable
-    private BackgroundType backgroundType;
+    @Length(min = 2, max = 5, message = BACKGROUND_TYPE_LENGTH_ERROR)
+    private String backgroundType;
 
     @Schema(name = "background value", defaultValue = "#F4F4F4", description = "A background color of the page")
     @Length(min = 2, max = 50, message = BACKGROUND_VALUE_LENGTH_ERROR)

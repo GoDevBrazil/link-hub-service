@@ -1,12 +1,12 @@
 package com.godev.linkhubservice.domain.services.impl;
 
-import com.godev.linkhubservice.domain.enums.BackgroundType;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
-import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.domain.repository.PageRepository;
+import com.godev.linkhubservice.domain.services.AccountService;
 import com.godev.linkhubservice.domain.services.PageService;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
@@ -23,18 +23,20 @@ import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS
 public class PageServiceImpl implements PageService {
 
     private final PageRepository pageRepository;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
-    public PageServiceImpl(PageRepository pageRepository, AccountRepository accountRepository) {
+    public PageServiceImpl(PageRepository pageRepository, AccountService accountService) {
         this.pageRepository = pageRepository;
-        this.accountRepository = accountRepository;
+        this.accountService = accountService;
     }
 
     @Override
     public PageResponse create(CreatePageRequest createPageRequest) {
 
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var account = accountRepository.findByEmail(userDetails.getUsername());
+        var accountResponse = accountService.findByEmail(userDetails.getUsername());
+        var account = new Account();
+        account.setId(accountResponse.getId());
 
         this.pageRepository.findBySlug(createPageRequest.getSlug())
                 .ifPresent(page -> {
@@ -45,13 +47,13 @@ public class PageServiceImpl implements PageService {
 
         var page = Page
                 .builder()
-                .withAccount(account.get())
+                .withAccount(account)
                 .withSlug(createPageRequest.getSlug())
                 .withTitle(createPageRequest.getTitle())
                 .withDescription(createPageRequest.getDescription())
                 .withPhoto(createPageRequest.getPhoto())
                 .withFontColor(createPageRequest.getFontColor())
-                .withBackgroundType(createPageRequest.getBackgroundType().toString())
+                .withBackgroundType(createPageRequest.getBackgroundType())
                 .withBackgroundValue(createPageRequest.getBackgroundValue())
                 .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
@@ -67,7 +69,7 @@ public class PageServiceImpl implements PageService {
                 .withDescription(pageSaved.getDescription())
                 .withPhoto(pageSaved.getPhoto())
                 .withFontColor(pageSaved.getFontColor())
-                .withBackgroundType(BackgroundType.valueOf(pageSaved.getBackgroundType()))
+                .withBackgroundType(pageSaved.getBackgroundType())
                 .withBackgroundValue(pageSaved.getBackgroundValue())
                 .withCreatedAt(pageSaved.getCreatedAt())
                 .withUpdatedAt(pageSaved.getUpdatedAt())

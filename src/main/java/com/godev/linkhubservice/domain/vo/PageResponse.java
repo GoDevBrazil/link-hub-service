@@ -1,7 +1,6 @@
 package com.godev.linkhubservice.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.godev.linkhubservice.domain.enums.BackgroundType;
 import com.godev.linkhubservice.domain.models.Account;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ public class PageResponse {
     private String description;
     private String photo;
     private String fontColor;
-    private BackgroundType backgroundType;
+    private String backgroundType;
     private String backgroundValue;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

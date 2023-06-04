@@ -25,6 +25,7 @@ import java.time.ZoneOffset;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_EXISTS_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
 public class AccountServiceImpl implements AccountService, UserDetailsService {
@@ -80,6 +81,19 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         );
     }
 
+    @Override
+    public AccountResponse findByEmail(String email) {
+        Account account = this.accountRepository.findByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
+                ));
+
+        return AccountResponse
+                .builder()
+                .withId(account.getId())
+                .build();
+    }
+
     private boolean accountExists(String email) {
         var account = accountRepository.findByEmail(email).orElse(null);
         return ObjectUtils.isNotEmpty(account);
@@ -90,7 +104,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         var account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException(
-                        new Issue(IssueEnum.OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
+                        new Issue(OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
                 ));
                 return User
                         .builder()
@@ -99,4 +113,5 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                         .roles("USER")
                         .build();
     }
+
 }
