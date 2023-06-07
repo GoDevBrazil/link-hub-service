@@ -10,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_FONT_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_URL_ERROR;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.FONT_COLOR_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_TYPE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.BACKGROUND_VALUE_LENGTH_ERROR;
@@ -47,6 +49,7 @@ public class CreatePageRequest {
 
     @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
     @Length(min = 2, max = 7, message = FONT_COLOR_LENGTH_ERROR)
+    @Pattern(regexp = FONT_COLOR_VALIDATION_REGEX, message = INVALID_FONT_COLOR_ERROR)
     private String fontColor;
 
     @Schema(name = "background type", defaultValue = "color", description = "A background type of the page")
