@@ -50,6 +50,10 @@ public class PageServiceImpl implements PageService {
             createPageRequest.setPhoto("avatar.png");
         }
 
+        if(ObjectUtils.isEmpty(createPageRequest.getFontColor()) || createPageRequest.getFontColor() == null){
+            createPageRequest.setFontColor("#212121");
+        }
+
         var page = Page
                 .builder()
                 .withAccount(account)
