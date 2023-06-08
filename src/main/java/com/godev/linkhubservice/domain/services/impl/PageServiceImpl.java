@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 
 @Service
@@ -50,8 +51,18 @@ public class PageServiceImpl implements PageService {
             createPageRequest.setPhoto("avatar.png");
         }
 
-        if(ObjectUtils.isEmpty(createPageRequest.getFontColor()) || createPageRequest.getFontColor() == null){
+        if(ObjectUtils.isEmpty(createPageRequest.getFontColor())){
             createPageRequest.setFontColor("#212121");
+        }
+
+        if(!createPageRequest.getBackgroundType().equals("COLOR") && !createPageRequest.getBackgroundType().equals("IMAGE")) {
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
+            );
+        }
+
+        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundType())) {
+            createPageRequest.setBackgroundType("COLOR");
         }
 
         var page = Page

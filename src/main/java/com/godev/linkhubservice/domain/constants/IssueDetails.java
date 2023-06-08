@@ -11,6 +11,7 @@ public class IssueDetails {
     public static final String  INVALID_CREDENTIALS_ERROR = "Usuário e/ou senha inválidos.";
     public static final String  INVALID_URL_ERROR = "Essa url não pode ser adicionada.";
     public static final String  INVALID_FONT_COLOR_ERROR = "Formato de cor da fonte inválido.";
+    public static final String  INVALID_BACKGROUND_TYPE_ERROR = "Formato de cor do fundo inválido. Selecione COR ou IMAGEM.";
     public static final String  EMAIL_NOT_FOUND_ERROR = "Conta com o email '%s' não encontrada.";
 
 }
