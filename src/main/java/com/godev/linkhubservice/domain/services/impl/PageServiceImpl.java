@@ -18,8 +18,17 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.PAGE_BACKGROUND_TYPE_IMAGE;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BACKGROUND_TYPE_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 
 @Service
 public class PageServiceImpl implements PageService {
@@ -48,21 +57,40 @@ public class PageServiceImpl implements PageService {
                 });
 
         if(ObjectUtils.isEmpty(createPageRequest.getPhoto())){
-            createPageRequest.setPhoto("avatar.png");
+            createPageRequest.setPhoto(DEFAULT_PAGE_PHOTO);
         }
 
         if(ObjectUtils.isEmpty(createPageRequest.getFontColor())){
-            createPageRequest.setFontColor("#212121");
+            createPageRequest.setFontColor(DEFAULT_PAGE_FONT_COLOR);
         }
 
-        if(!createPageRequest.getBackgroundType().equals("COLOR") && !createPageRequest.getBackgroundType().equals("IMAGE")) {
+        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundType())) {
+            createPageRequest.setBackgroundType(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR);
+        }
+
+        if(!createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
+                !createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE)) {
             throw new RuleViolationException(
                     new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
             );
         }
 
-        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundType())) {
-            createPageRequest.setBackgroundType("COLOR");
+        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundValue())){
+            createPageRequest.setBackgroundValue(DEFAULT_PAGE_BACKGROUND_VALUE);
+        }
+
+        if(createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
+                !createPageRequest.getBackgroundValue().matches(HEX_VALIDATION_REGEX)){
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
+            );
+        }
+
+        if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
+                !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
+            );
         }
 
         var page = Page

@@ -12,11 +12,10 @@ public class ValidationConstants {
     public static final String  DESCRIPTION_LENGTH_ERROR = "O campo descrição precisa ter entre 20 e 200 caracteres.";
     public static final String  PHOTO_LENGTH_ERROR = "O campo foto precisa ter entre 20 e 100 caracteres.";
     public static final String  FONT_COLOR_LENGTH_ERROR = "O campo cor da fonte precisa ter entre 4 e 7 caracteres.";
-    public static final String  BACKGROUND_TYPE_LENGTH_ERROR = "O campo tipo de fundo precisa ter entre 2 e 5 caracteres.";
-    public static final String  BACKGROUND_VALUE_LENGTH_ERROR = "O campo valor de fundo precisa ter entre 2 e 50 caracteres.";
 
 
     public static final String  EMAIL_FORMAT_ERROR = "O campo email precisa ser preenchido com um e-mail no formato válido.";
+    public static final String  URL_OR_HEX_FORMAT_ERROR = "O campo valor de fundo precisa seguir o padrão da plataforma Imgur ou precisa ser no formato de hexadecimal (#F4F4F4).";
     public static final String  PASSWORD_FORMAT_ERROR = "O campo senha precisa ter entre 8 e 16 caracteres contendo pelo menos " +
             "uma letra maíúscula, uma minúscula, um número e um caractere especial.";
 
