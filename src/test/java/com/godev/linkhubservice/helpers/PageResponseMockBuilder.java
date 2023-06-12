@@ -1,6 +1,5 @@
 package com.godev.linkhubservice.helpers;
 
-import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 
 import java.time.OffsetDateTime;
@@ -9,11 +8,8 @@ public class PageResponseMockBuilder {
 
     private final PageResponse pageResponse;
 
-    private final Account account;
-
     public PageResponseMockBuilder() {
         this.pageResponse = new PageResponse();
-        this.account = new Account();
     }
 
     public static PageResponseMockBuilder getBuilder() { return new PageResponseMockBuilder();}
@@ -30,6 +26,7 @@ public class PageResponseMockBuilder {
         this.pageResponse.setBackgroundValue("#193153");
         this.pageResponse.setCreatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
         this.pageResponse.setUpdatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
+        var account = AccountMockBuilder.getBuilder().mock().build();
         this.pageResponse.setAccount(account);
 
         return this;
