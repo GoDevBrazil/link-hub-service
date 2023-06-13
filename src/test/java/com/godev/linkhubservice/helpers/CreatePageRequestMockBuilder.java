@@ -23,5 +23,55 @@ public class CreatePageRequestMockBuilder {
         return this;
     }
 
+    public CreatePageRequestMockBuilder withNullSlug() {
+
+        this.createPageRequest.setSlug(null);
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withEmptySlug() {
+
+        this.createPageRequest.setSlug("");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidLengthSlug() {
+
+        this.createPageRequest.setSlug("Law");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidLengthTittle() {
+
+        this.createPageRequest.setTitle("Law");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidLengthDescription() {
+
+        this.createPageRequest.setDescription("O law é legal.");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidUrlFormatPhoto() {
+
+        this.createPageRequest.setPhoto("https://img.elo7.com.br/product/original/3254FDB/" +
+                "bob-esponja-e-patrick-em-camadas-arquivo-de-corte-personalizados-bob-esponja-e-patrick.jpg");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidLengthFontColor() {
+
+        this.createPageRequest.setFontColor("#ab");
+
+        return this;
+    }
+
     public CreatePageRequest build() { return createPageRequest;}
 }

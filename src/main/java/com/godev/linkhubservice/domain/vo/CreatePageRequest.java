@@ -43,7 +43,7 @@ public class CreatePageRequest {
     private String description;
 
     @Schema(name = "photo", defaultValue = "Link hub page photo.", description = "A photo of the page")
-    @Length(min = 20, max = 100, message = PHOTO_LENGTH_ERROR)
+    @Length(min = 10, max = 150, message = PHOTO_LENGTH_ERROR)
     @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_ERROR)
     private String photo;
 
