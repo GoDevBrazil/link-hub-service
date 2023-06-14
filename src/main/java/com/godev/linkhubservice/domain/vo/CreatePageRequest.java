@@ -16,7 +16,6 @@ import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_OR_UR
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.FONT_COLOR_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PHOTO_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
@@ -48,7 +47,7 @@ public class CreatePageRequest {
     private String photo;
 
     @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
-    @Length(min = 4, max = 7, message = FONT_COLOR_LENGTH_ERROR)
+    //@Length(min = 4, max = 7, message = FONT_COLOR_LENGTH_ERROR)
     @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_ERROR)
     private String fontColor;
 

@@ -73,5 +73,26 @@ public class CreatePageRequestMockBuilder {
         return this;
     }
 
+    public CreatePageRequestMockBuilder withInvalidRgbFormatFontColor() {
+
+        this.createPageRequest.setFontColor("(54, 54, 54)");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidNameFormatFontColor() {
+
+        this.createPageRequest.setFontColor("deep purple");
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidRgbFormatBackgroundValue() {
+
+        this.createPageRequest.setBackgroundValue("(54, 54, 54)");
+
+        return this;
+    }
+
     public CreatePageRequest build() { return createPageRequest;}
 }

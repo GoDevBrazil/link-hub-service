@@ -20,12 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_FONT_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_URL_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.FONT_COLOR_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -170,6 +171,48 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, FONT_COLOR_LENGTH_ERROR))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenFontColorFieldHasInvalidRgbFormat() throws Exception{
+
+        final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatFontColor().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(post("/page")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenFontColorFieldHasInvalidNameFormat() throws Exception{
+
+        final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidNameFormatFontColor().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(post("/page")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenBackgroundValueFieldHasInvalidRgbColorFormat() throws Exception{
+
+        final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(post("/page")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))));
     }
 }
