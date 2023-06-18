@@ -59,7 +59,8 @@ class AccountServiceImplTest {
 
         when(this.accountRepository.findByEmail(mockedAccountRequest.getEmail())).thenReturn(Optional.of(mockedAccountSaved));
 
-        RuleViolationException ruleViolationException = assertThrows(RuleViolationException.class, () -> this.accountService.register(mockedAccountRequest));
+        RuleViolationException ruleViolationException = assertThrows(RuleViolationException.class,
+                () -> this.accountService.register(mockedAccountRequest));
         Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(EMAIL_EXISTS_ERROR, mockedAccountRequest.getEmail())), ruleViolationException.getIssue().getDetails());
 

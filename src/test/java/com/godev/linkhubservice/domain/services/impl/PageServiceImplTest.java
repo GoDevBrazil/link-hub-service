@@ -1,11 +1,17 @@
 package com.godev.linkhubservice.domain.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.services.AccountService;
+import com.godev.linkhubservice.domain.vo.AccountResponse;
+import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageMockBuilder;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,8 +24,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
 import java.util.Optional;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,36 +45,60 @@ class PageServiceImplTest {
     @InjectMocks
     private PageServiceImpl pageService;
 
-    @Test
-    void shouldReturnPageResponseWhenSaveSuccess(){
-        //arrange
-        UserDetails userDetails = User.builder()
-                .username("kibe@email.com")
-                .password("321")
-                .roles("USER")
-                .build();
+    CreatePageRequest mockedCreatePageRequest;
+    AccountResponse mockedAccountResponse;
+    Page mockedPageSaved;
+    UserDetails userDetails = User.builder()
+            .username("kibe@email.com")
+            .password("321")
+            .roles("USER")
+            .build();
+
+    @BeforeEach
+    void setup(){
         Authentication authentication = Mockito.mock(Authentication.class);
-        Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
+        Mockito.when(authentication.getPrincipal()).thenReturn(this.userDetails);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        final var mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
-        final var mockedAccountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
-        final var mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
+        this.mockedAccountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
+    }
 
-        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(mockedAccountResponse);
-        when(this.pageRepository.findBySlug(mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
-        when(this.pageRepository.save(any())).thenReturn(mockedPageSaved);
+    @Test
+    void shouldReturnPageResponseWhenSaveSuccess(){
+        //arrange
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
         //action
-        final var pageResponse = pageService.create(mockedCreatePageRequest);
+        final var pageResponse = this.pageService.create(this.mockedCreatePageRequest);
 
         //assert
         Assertions.assertNotNull(pageResponse);
-        Assertions.assertEquals(mockedPageSaved.getId(), pageResponse.getId());
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
         verify(this.pageRepository, times(1)).save(any());
-        verify(this.pageRepository, times(1)).findBySlug(mockedCreatePageRequest.getSlug());
-        verify(this.accountService, times(1)).findByEmail(userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    void shouldThrowRuleViolationExceptionWhenSlugAlreadyExists(){
+        //arrange
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug()))
+                .thenReturn(Optional.of(this.mockedPageSaved));
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.create(this.mockedCreatePageRequest));
+
+        //assert
+        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(SLUG_EXISTS_ERROR, this.mockedCreatePageRequest.getSlug())),
+                ruleViolationException.getIssue().getDetails());
     }
 }
