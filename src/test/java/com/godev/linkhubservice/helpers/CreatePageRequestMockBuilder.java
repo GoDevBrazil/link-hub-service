@@ -106,6 +106,12 @@ public class CreatePageRequestMockBuilder {
 
         return this;
     }
+    public CreatePageRequestMockBuilder withNullBackgroundType() {
+
+        this.createPageRequest.setBackgroundType(null);
+
+        return this;
+    }
 
     public CreatePageRequest build() { return createPageRequest;}
 }

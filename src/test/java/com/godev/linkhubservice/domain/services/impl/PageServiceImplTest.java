@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 import java.util.Optional;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
@@ -145,6 +146,29 @@ class PageServiceImplTest {
         Assertions.assertNotNull(pageResponse);
         Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
         Assertions.assertEquals(DEFAULT_PAGE_FONT_COLOR, pageResponse.getFontColor());
+        verify(this.pageRepository, times(1)).save(any());
+        verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    void shouldReturnPageResponseWithDefaultBackgroundTypeColorWhenCreatePageRequestHasNullBackgroundType(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build();
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundTypeColor().build();
+
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.create(this.mockedCreatePageRequest);
+
+        //assert
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        Assertions.assertEquals(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR, pageResponse.getBackgroundType());
         verify(this.pageRepository, times(1)).save(any());
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
