@@ -65,6 +65,12 @@ public class CreatePageRequestMockBuilder {
 
         return this;
     }
+    public CreatePageRequestMockBuilder withNullPhoto() {
+
+        this.createPageRequest.setPhoto(null);
+
+        return this;
+    }
 
     public CreatePageRequestMockBuilder withInvalidLengthFontColor() {
 

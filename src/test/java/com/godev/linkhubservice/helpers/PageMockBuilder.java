@@ -5,6 +5,8 @@ import com.godev.linkhubservice.domain.models.Page;
 
 import java.time.OffsetDateTime;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
+
 public class PageMockBuilder {
 
     private final Page page;
@@ -38,6 +40,12 @@ public class PageMockBuilder {
     public PageMockBuilder withId() {
 
         this.page.setId(1);
+
+        return this;
+    }
+    public PageMockBuilder withDefaultPhoto() {
+
+        this.page.setPhoto(DEFAULT_PAGE_PHOTO);
 
         return this;
     }

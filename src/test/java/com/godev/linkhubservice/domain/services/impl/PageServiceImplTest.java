@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 import java.util.Optional;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -100,5 +101,28 @@ class PageServiceImplTest {
         Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(SLUG_EXISTS_ERROR, this.mockedCreatePageRequest.getSlug())),
                 ruleViolationException.getIssue().getDetails());
+    }
+
+    @Test
+    void shouldReturnPageResponseWithDefaultPhotoWhenCreatePageRequestHasNullPhoto(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build();
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultPhoto().build();
+
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.create(this.mockedCreatePageRequest);
+
+        //assert
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        Assertions.assertEquals(DEFAULT_PAGE_PHOTO, pageResponse.getPhoto());
+        verify(this.pageRepository, times(1)).save(any());
+        verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
     }
 }
