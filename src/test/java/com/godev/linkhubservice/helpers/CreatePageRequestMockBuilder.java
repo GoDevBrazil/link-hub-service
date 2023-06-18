@@ -2,6 +2,8 @@ package com.godev.linkhubservice.helpers;
 
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.PAGE_BACKGROUND_TYPE_IMAGE;
+
 public class CreatePageRequestMockBuilder {
 
     private final CreatePageRequest createPageRequest;
@@ -106,9 +108,30 @@ public class CreatePageRequestMockBuilder {
 
         return this;
     }
+
     public CreatePageRequestMockBuilder withNullBackgroundType() {
 
         this.createPageRequest.setBackgroundType(null);
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withInvalidBackgroundType() {
+
+        this.createPageRequest.setBackgroundType("Javax");
+
+        return this;
+    }
+    public CreatePageRequestMockBuilder withBackgroundTypeImage() {
+
+        this.createPageRequest.setBackgroundType(PAGE_BACKGROUND_TYPE_IMAGE);
+
+        return this;
+    }
+
+    public CreatePageRequestMockBuilder withNullBackgroundValue() {
+
+        this.createPageRequest.setBackgroundValue(null);
 
         return this;
     }

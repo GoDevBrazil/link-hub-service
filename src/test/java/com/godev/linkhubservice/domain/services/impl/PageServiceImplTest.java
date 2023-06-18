@@ -12,6 +12,7 @@ import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageMockBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +29,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BACKGROUND_TYPE_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -172,5 +177,84 @@ class PageServiceImplTest {
         verify(this.pageRepository, times(1)).save(any());
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    void shouldThrowRuleViolationExceptionWhenBackgroundTypeFieldIsDifferentOfColorAndImage(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidBackgroundType().build();
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.create(this.mockedCreatePageRequest));
+
+        //assert
+        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(INVALID_BACKGROUND_TYPE_ERROR),
+                ruleViolationException.getIssue().getDetails());
+    }
+
+    @Test
+    void shouldReturnPageResponseWithDefaultBackgroundValueWhenCreatePageRequestHasNullBackgroundValue(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build();
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundValue().build();
+
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.create(this.mockedCreatePageRequest);
+
+        //assert
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        Assertions.assertEquals(DEFAULT_PAGE_BACKGROUND_VALUE, pageResponse.getBackgroundValue());
+        verify(this.pageRepository, times(1)).save(any());
+        verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should throw Rule Violation Exception when Background type is selected as COLOR and Background value is not hex format")
+    void createPageMismatchBackgroundTypeValue(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build();
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.create(this.mockedCreatePageRequest));
+
+        //assert
+        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR),
+                ruleViolationException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should throw Rule Violation Exception when Background type is selected as IMAGE and Background value is not a url format valid")
+    void createPageMismatchBackgroundTypeValue2(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withBackgroundTypeImage().withInvalidUrlFormatPhoto().build();
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.create(this.mockedCreatePageRequest));
+
+        //assert
+        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR),
+                ruleViolationException.getIssue().getDetails());
     }
 }
