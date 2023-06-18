@@ -5,6 +5,7 @@ import com.godev.linkhubservice.domain.models.Page;
 
 import java.time.OffsetDateTime;
 
+import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 
 public class PageMockBuilder {
@@ -46,6 +47,12 @@ public class PageMockBuilder {
     public PageMockBuilder withDefaultPhoto() {
 
         this.page.setPhoto(DEFAULT_PAGE_PHOTO);
+
+        return this;
+    }
+    public PageMockBuilder withDefaultFontColor() {
+
+        this.page.setFontColor(DEFAULT_PAGE_FONT_COLOR);
 
         return this;
     }

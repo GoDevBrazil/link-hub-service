@@ -93,6 +93,13 @@ public class CreatePageRequestMockBuilder {
         return this;
     }
 
+    public CreatePageRequestMockBuilder withNullFontColor() {
+
+        this.createPageRequest.setFontColor(null);
+
+        return this;
+    }
+
     public CreatePageRequestMockBuilder withInvalidRgbFormatBackgroundValue() {
 
         this.createPageRequest.setBackgroundValue("(54, 54, 54)");
