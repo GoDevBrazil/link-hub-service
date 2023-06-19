@@ -70,8 +70,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            jecesario/link-hub-service:latest
-            jecesario/link-hub-service:v${{ github.run_number }}
+            jecesariodev/link-hub-service:latest
+            jecesariodev/link-hub-service:v${{ github.run_number }}
 
   deploy-dev:
       name: 🚀 Deploy DEV
