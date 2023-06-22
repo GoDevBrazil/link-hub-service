@@ -32,10 +32,10 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BACKGROUND_TYPE_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

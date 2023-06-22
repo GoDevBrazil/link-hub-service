@@ -20,9 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_FONT_COLOR_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_URL_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
@@ -157,7 +157,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_URL_ERROR))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR))));
     }
 
     @Test
@@ -171,7 +171,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test
@@ -185,7 +185,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test
@@ -199,7 +199,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_ERROR))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test

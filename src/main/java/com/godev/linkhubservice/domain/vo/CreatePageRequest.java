@@ -10,12 +10,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_FONT_COLOR_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_URL_ERROR;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_OR_URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
@@ -41,11 +41,11 @@ public class CreatePageRequest {
     private String description;
 
     @Schema(name = "photo", defaultValue = "Link hub page photo.", description = "A photo of the page")
-    @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_ERROR)
+    @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_FORMAT_ERROR)
     private String photo;
 
     @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
-    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_ERROR)
+    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
     private String fontColor;
 
     @Schema(name = "background type", defaultValue = "color", description = "A background type of the page")
