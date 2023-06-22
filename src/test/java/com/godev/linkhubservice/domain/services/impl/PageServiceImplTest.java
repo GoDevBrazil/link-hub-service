@@ -76,7 +76,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldReturnPageResponseWhenSaveSuccess(){
+    @DisplayName("Should return Page Response when save success")
+    void pageHappyPath(){
         //arrange
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
@@ -94,7 +95,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldThrowRuleViolationExceptionWhenSlugAlreadyExists(){
+    @DisplayName("Should throw Rule Violation exception when Slug already exists")
+    void slugAlreadyExists(){
         //arrange
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug()))
@@ -111,7 +113,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldReturnPageResponseWithDefaultPhotoWhenCreatePageRequestHasNullPhoto(){
+    @DisplayName("Should return Page Response with default photo when Create Page Request has null Photo")
+    void nullPhoto(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultPhoto().build();
@@ -134,7 +137,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldReturnPageResponseWithDefaultFontColorWhenCreatePageRequestHasNullFontColor(){
+    @DisplayName("Should return Page Response with default Font Color when Create Page Request has null Font Color")
+    void nullFontColor(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultFontColor().build();
@@ -157,7 +161,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldReturnPageResponseWithDefaultBackgroundTypeColorWhenCreatePageRequestHasNullBackgroundType(){
+    @DisplayName("Should return Page Response with default Background Type Color when Create Page Request has null Background Type")
+    void nullBackgroundType(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundTypeColor().build();
@@ -180,7 +185,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldThrowRuleViolationExceptionWhenBackgroundTypeFieldIsDifferentOfColorAndImage(){
+    @DisplayName("Should throw Rule Violation exception when Background Type field is different of Color and Image")
+    void backgroundTypeDifferentOfColorAndImage(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidBackgroundType().build();
 
@@ -198,7 +204,8 @@ class PageServiceImplTest {
     }
 
     @Test
-    void shouldReturnPageResponseWithDefaultBackgroundValueWhenCreatePageRequestHasNullBackgroundValue(){
+    @DisplayName("Should return Page Response with default Background Value when Create Page Request has null Background Value")
+    void nullBackgroundValue(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundValue().build();
@@ -221,7 +228,7 @@ class PageServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw Rule Violation Exception when Background type is selected as COLOR and Background value is not hex format")
+    @DisplayName("Should throw Rule Violation exception when Background type is selected as COLOR and Background value is not hex format")
     void createPageMismatchBackgroundTypeValue(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build();
@@ -240,7 +247,7 @@ class PageServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw Rule Violation Exception when Background type is selected as IMAGE and Background value is not a url format valid")
+    @DisplayName("Should throw Rule Violation exception when Background type is selected as IMAGE and Background value is not a url format valid")
     void createPageMismatchBackgroundTypeValue2(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withBackgroundTypeImage().withInvalidUrlFormatPhoto().build();
