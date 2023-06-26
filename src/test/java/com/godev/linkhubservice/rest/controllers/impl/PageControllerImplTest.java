@@ -9,6 +9,7 @@ import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldRegisterPageWhenValidBodyIsPassed() throws Exception{
+    @DisplayName("Should register page when valid body is passed")
+    void pageControllerHappyPath() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
         final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
@@ -77,7 +79,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenSlugFieldIsNull() throws Exception{
+    @DisplayName("Should throw bad request when slug field is null")
+    void slugFieldIsNull() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build();
         final var bearerToken = "Bearer kibe";
@@ -91,7 +94,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenSlugFieldIsEmpty() throws Exception{
+    @DisplayName("Should throw bad request when slug field is empty")
+    void slugFieldIsEmpty() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withEmptySlug().build();
         final var bearerToken = "Bearer kibe";
@@ -105,7 +109,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenSlugFieldHasInvalidLength() throws Exception{
+    @DisplayName("Should throw bad request when slug field has invalid length")
+    void slugFieldHasInvalidLength() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build();
         final var bearerToken = "Bearer kibe";
@@ -119,7 +124,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenTittleFieldHasInvalidLength() throws Exception{
+    @DisplayName("Should throw bad request when tittle field has invalid length")
+    void tittleFieldHasInvalidLength() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTittle().build();
         final var bearerToken = "Bearer kibe";
@@ -133,7 +139,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenDescriptionFieldHasInvalidLength() throws Exception{
+    @DisplayName("Should throw bad request when description field has invalid length")
+    void descriptionFieldHasInvalidLength() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build();
         final var bearerToken = "Bearer kibe";
@@ -147,7 +154,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenPhotoFieldHasInvalidUrlFormat() throws Exception{
+    @DisplayName("Should throw bad request when photo field has invalid url format")
+    void photoFieldHasInvalidUrlFormat() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidUrlFormatPhoto().build();
         final var bearerToken = "Bearer kibe";
@@ -161,7 +169,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenFontColorFieldHasInvalidLength() throws Exception{
+    @DisplayName("Should throw bad request when font color field has invalid length")
+    void fontColorFieldHasInvalidLength() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthFontColor().build();
         final var bearerToken = "Bearer kibe";
@@ -175,7 +184,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenFontColorFieldHasInvalidRgbFormat() throws Exception{
+    @DisplayName("Should throw bad request when font color field has invalid rgb format")
+    void fontColorFieldHasInvalidRgbFormat() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatFontColor().build();
         final var bearerToken = "Bearer kibe";
@@ -189,7 +199,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenFontColorFieldHasInvalidNameFormat() throws Exception{
+    @DisplayName("Should throw bad request when font color field has invalid name format")
+    void fontColorFieldHasInvalidNameFormat() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidNameFormatFontColor().build();
         final var bearerToken = "Bearer kibe";
@@ -203,7 +214,8 @@ class PageControllerImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenBackgroundValueFieldHasInvalidRgbColorFormat() throws Exception{
+    @DisplayName("Should throw bad request when background value field has invalid rgb color format")
+    void backgroundValueFieldHasInvalidRgbColorFormat() throws Exception{
 
         final var createPageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build();
         final var bearerToken = "Bearer kibe";

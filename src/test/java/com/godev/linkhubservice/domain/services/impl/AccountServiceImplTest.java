@@ -7,6 +7,7 @@ import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,7 +35,8 @@ class AccountServiceImplTest {
     private AccountServiceImpl accountService;
 
     @Test
-    void shouldReturnAccountResponseWhenSaveSuccess() {
+    @DisplayName("Should return Account Response when save success")
+    void accountHappyPath() {
 
         final var mockedAccountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -52,7 +54,8 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenEmailIsAlreadyRegistered() {
+    @DisplayName("Should throw exception when email is already registered")
+    void emailAlreadyRegistered() {
 
         final var mockedAccountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -67,7 +70,8 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldReturnUserDetailsWhenValidCredentialsIsPassed(){
+    @DisplayName("Should return User Details when valid credentials is passed")
+    void userDetailsHappyPath(){
 
         final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
