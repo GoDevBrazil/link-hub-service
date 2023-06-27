@@ -1,5 +1,6 @@
 package com.godev.linkhubservice.domain.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -72,18 +74,39 @@ class AccountServiceImplTest {
     @Test
     @DisplayName("Should return User Details when valid credentials is passed")
     void userDetailsHappyPath(){
-
+        //arrange
         final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
 
         when(this.accountRepository.findByEmail(mockedAuthRequest.getEmail())).thenReturn(Optional.of(mockedAccountSaved));
         when(this.passwordEncoder.matches(mockedAuthRequest.getPassword(), mockedAccountSaved.getPassword())).thenReturn(Boolean.TRUE);
 
+        //action
         UserDetails userDetails = this.accountService.auth(mockedAuthRequest);
 
+        //assertion
         Assertions.assertNotNull(userDetails);
         Assertions.assertEquals(mockedAccountSaved.getEmail(), userDetails.getUsername());
         Assertions.assertEquals(mockedAccountSaved.getPassword(), userDetails.getPassword());
         Assertions.assertEquals("ROLE_USER", userDetails.getAuthorities().stream().toList().get(0).toString());
+    }
+
+    @Test
+    @DisplayName("Should throw bad request exception when invalid credentials is passed")
+    void invalidCredentials(){
+        //arrange
+        final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
+        final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
+
+        when(this.accountRepository.findByEmail(mockedAuthRequest.getEmail())).thenReturn(Optional.of(mockedAccountSaved));
+        when(this.passwordEncoder.matches(mockedAuthRequest.getPassword(), mockedAccountSaved.getPassword())).thenReturn(Boolean.FALSE);
+
+        //action
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> this.accountService.auth(mockedAuthRequest));
+
+        //assertion
+        Assertions.assertEquals(IssueEnum.HEADER_REQUIRED_ERROR.getMessage(), badRequestException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(INVALID_CREDENTIALS_ERROR), badRequestException.getIssue().getDetails());
     }
 }
