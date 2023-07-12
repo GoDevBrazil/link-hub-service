@@ -3,11 +3,9 @@ name: 🚀 Java CI/CD Pipeline
 on:
   push:
     branches: ['main']
-  pull_request_target:
-    types:
-      - opened
+  pull_request:
     branches:
-      - 'feature/**'
+      - main
   workflow_dispatch:
 
 env:
