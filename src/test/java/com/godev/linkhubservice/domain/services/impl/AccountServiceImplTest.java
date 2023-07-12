@@ -2,6 +2,7 @@ package com.godev.linkhubservice.domain.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
@@ -21,10 +22,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
@@ -38,7 +42,7 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("Should return Account Response when save success")
-    void accountHappyPath() {
+    void accountRegisterHappyPath() {
 
         final var mockedAccountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -56,8 +60,8 @@ class AccountServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when email is already registered")
-    void emailAlreadyRegistered() {
+    @DisplayName("Should throw RuleViolationException when email is already registered")
+    void accountRegisterFails() {
 
         final var mockedAccountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -73,7 +77,7 @@ class AccountServiceImplTest {
 
     @Test
     @DisplayName("Should return User Details when valid credentials is passed")
-    void userDetailsHappyPath(){
+    void authHappyPath(){
         //arrange
         final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -92,8 +96,8 @@ class AccountServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request exception when invalid credentials is passed")
-    void invalidCredentials(){
+    @DisplayName("Should throw BadRequestException when invalid credentials is passed")
+    void authFails(){
         //arrange
         final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
@@ -107,6 +111,77 @@ class AccountServiceImplTest {
 
         //assertion
         Assertions.assertEquals(IssueEnum.HEADER_REQUIRED_ERROR.getMessage(), badRequestException.getIssue().getMessage());
-        Assertions.assertEquals(List.of(INVALID_CREDENTIALS_ERROR), badRequestException.getIssue().getDetails());
+        Assertions.assertEquals(INVALID_CREDENTIALS_ERROR, badRequestException.getIssue().getDetails().get(0));
     }
+
+    @Test
+    @DisplayName("Should return Account Response with ID when email is already registered")
+    void findAccountByEmailHappyPath(){
+        //arrange
+        final var mockedEmail = "kibe@email.com";
+        final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
+
+        when(this.accountRepository.findByEmail(mockedEmail)).thenReturn(Optional.of(mockedAccountSaved));
+
+        //action
+        final var accountResponse = this.accountService.findByEmail(mockedEmail);
+
+        //assertion
+        Assertions.assertNotNull(accountResponse);
+        Assertions.assertEquals(mockedAccountSaved.getId(), accountResponse.getId());
+        verify(this.accountRepository, times(1)).findByEmail(mockedEmail);
+    }
+
+    @Test
+    @DisplayName("Should throw ObjectNotFoundException when email isn't found")
+    void findAccountByEmailFails(){
+        //arrange
+        final var mockedEmail = "kibe@email.com";
+
+        when(this.accountRepository.findByEmail(mockedEmail)).thenReturn(Optional.empty());
+
+        //action
+        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class,
+                () -> this.accountService.findByEmail(mockedEmail));
+
+        //assertion
+        Assertions.assertEquals(IssueEnum.OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
+        Assertions.assertEquals(String.format(EMAIL_NOT_FOUND_ERROR, mockedEmail), objectNotFoundException.getIssue().getDetails().get(0));
+    }
+
+    @Test
+    @DisplayName("Should return User Details when valid credentials is passed in user authentication")
+    void loadUserByUsernameHappyPath(){
+        //arrange
+        final var mockedEmail = "kibe@email.com";
+        final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
+
+        when(this.accountRepository.findByEmail(mockedEmail)).thenReturn(Optional.of(mockedAccountSaved));
+
+        //action
+        final var userDetails = this.accountService.loadUserByUsername(mockedAccountSaved.getEmail());
+
+        //assertion
+        Assertions.assertNotNull(userDetails);
+        Assertions.assertEquals(mockedAccountSaved.getEmail(), userDetails.getUsername());
+        verify(this.accountRepository, times(1)).findByEmail(mockedAccountSaved.getEmail());
+    }
+
+    @Test
+    @DisplayName("Should throw ObjectNotFoundException when email isn't found in user authentication")
+    void loadUserByUsernameFails(){
+        //arrange
+        final var mockedEmail = "kibe@email.com";
+
+        when(this.accountRepository.findByEmail(mockedEmail)).thenReturn(Optional.empty());
+
+        //action
+        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class,
+                () -> this.accountService.loadUserByUsername(mockedEmail));
+
+        //assertions
+        Assertions.assertEquals(IssueEnum.OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
+        Assertions.assertEquals(String.format(EMAIL_NOT_FOUND_ERROR, mockedEmail), objectNotFoundException.getIssue().getDetails().get(0));
+    }
+
 }
