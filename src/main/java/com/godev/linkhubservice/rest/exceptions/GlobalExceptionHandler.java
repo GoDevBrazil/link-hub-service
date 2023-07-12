@@ -1,7 +1,10 @@
 package com.godev.linkhubservice.rest.exceptions;
 
+import com.godev.linkhubservice.domain.exceptions.BadRequestException;
+import com.godev.linkhubservice.domain.exceptions.InvalidJwtException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuleViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Issue handlerRuleViolationException(RuleViolationException e){
+        return e.getIssue();
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Issue handlerObjectNotFoundException(ObjectNotFoundException e){
+        return e.getIssue();
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Issue handlerBadRequestException(BadRequestException e) {
+        return e.getIssue();
+    }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Issue handlerInvalidJwtException(InvalidJwtException e) {
         return e.getIssue();
     }
 }

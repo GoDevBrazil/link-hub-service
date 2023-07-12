@@ -5,12 +5,15 @@ import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
+import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,8 @@ class AccountServiceImplTest {
 
     @Mock
     private AccountRepository accountRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private AccountServiceImpl accountService;
 
@@ -60,4 +65,20 @@ class AccountServiceImplTest {
 
     }
 
+    @Test
+    void shouldReturnUserDetailsWhenValidCredentialsIsPassed(){
+
+        final var mockedAuthRequest = AuthRequestMockBuilder.getBuilder().mock().build();
+        final var mockedAccountSaved = AccountMockBuilder.getBuilder().mock().withId().build();
+
+        when(this.accountRepository.findByEmail(mockedAuthRequest.getEmail())).thenReturn(Optional.of(mockedAccountSaved));
+        when(this.passwordEncoder.matches(mockedAuthRequest.getPassword(), mockedAccountSaved.getPassword())).thenReturn(Boolean.TRUE);
+
+        UserDetails userDetails = this.accountService.auth(mockedAuthRequest);
+
+        Assertions.assertNotNull(userDetails);
+        Assertions.assertEquals(mockedAccountSaved.getEmail(), userDetails.getUsername());
+        Assertions.assertEquals(mockedAccountSaved.getPassword(), userDetails.getPassword());
+        Assertions.assertEquals("ROLE_USER", userDetails.getAuthorities().stream().toList().get(0).toString());
+    }
 }
