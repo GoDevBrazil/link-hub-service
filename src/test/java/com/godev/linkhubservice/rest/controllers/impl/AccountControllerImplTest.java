@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.domain.services.AccountService;
+import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
