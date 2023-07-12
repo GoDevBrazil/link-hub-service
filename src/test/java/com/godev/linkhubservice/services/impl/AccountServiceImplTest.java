@@ -1,4 +1,4 @@
-package com.godev.linkhubservice.domain.services.impl;
+package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
