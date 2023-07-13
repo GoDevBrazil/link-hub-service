@@ -56,42 +56,9 @@ public class PageServiceImpl implements PageService {
                     );
                 });
 
-        if(ObjectUtils.isEmpty(createPageRequest.getPhoto())){
-            createPageRequest.setPhoto(DEFAULT_PAGE_PHOTO);
-        }
+        setDefaultValues(createPageRequest);
 
-        if(ObjectUtils.isEmpty(createPageRequest.getFontColor())){
-            createPageRequest.setFontColor(DEFAULT_PAGE_FONT_COLOR);
-        }
-
-        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundType())) {
-            createPageRequest.setBackgroundType(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR);
-        }
-
-        if(!createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
-                !createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE)) {
-            throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
-            );
-        }
-
-        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundValue())){
-            createPageRequest.setBackgroundValue(DEFAULT_PAGE_BACKGROUND_VALUE);
-        }
-
-        if(createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
-                !createPageRequest.getBackgroundValue().matches(HEX_VALIDATION_REGEX)){
-            throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
-            );
-        }
-
-        if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
-                !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
-            throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
-            );
-        }
+        validateBackgroundType(createPageRequest);
 
         var page = Page
                 .builder()
@@ -122,5 +89,46 @@ public class PageServiceImpl implements PageService {
                 .withCreatedAt(pageSaved.getCreatedAt())
                 .withUpdatedAt(pageSaved.getUpdatedAt())
                 .build();
+    }
+
+    private void validateBackgroundType(CreatePageRequest createPageRequest) {
+        if(!createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
+                !createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE)) {
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
+            );
+        }
+
+        if(createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
+                !createPageRequest.getBackgroundValue().matches(HEX_VALIDATION_REGEX)){
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
+            );
+        }
+
+        if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
+                !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
+            );
+        }
+    }
+
+    private void setDefaultValues(CreatePageRequest createPageRequest) {
+        if(ObjectUtils.isEmpty(createPageRequest.getPhoto())){
+            createPageRequest.setPhoto(DEFAULT_PAGE_PHOTO);
+        }
+
+        if(ObjectUtils.isEmpty(createPageRequest.getFontColor())){
+            createPageRequest.setFontColor(DEFAULT_PAGE_FONT_COLOR);
+        }
+
+        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundType())) {
+            createPageRequest.setBackgroundType(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR);
+        }
+
+        if(ObjectUtils.isEmpty(createPageRequest.getBackgroundValue())){
+            createPageRequest.setBackgroundValue(DEFAULT_PAGE_BACKGROUND_VALUE);
+        }
     }
 }
