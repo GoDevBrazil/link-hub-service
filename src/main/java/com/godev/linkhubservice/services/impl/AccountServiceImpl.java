@@ -1,4 +1,4 @@
-package com.godev.linkhubservice.domain.services.impl;
+package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
@@ -7,7 +7,7 @@ import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
-import com.godev.linkhubservice.domain.services.AccountService;
+import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;

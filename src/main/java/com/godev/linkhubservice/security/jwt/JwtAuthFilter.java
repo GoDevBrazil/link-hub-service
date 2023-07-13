@@ -1,6 +1,6 @@
 package com.godev.linkhubservice.security.jwt;
 
-import com.godev.linkhubservice.domain.services.impl.AccountServiceImpl;
+import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.godev.linkhubservice.domain.services.impl;
+package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
@@ -8,6 +8,7 @@ import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
+import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

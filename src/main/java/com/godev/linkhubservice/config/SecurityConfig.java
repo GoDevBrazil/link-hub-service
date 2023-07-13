@@ -1,6 +1,6 @@
 package com.godev.linkhubservice.config;
 
-import com.godev.linkhubservice.domain.services.impl.AccountServiceImpl;
+import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import com.godev.linkhubservice.security.jwt.JwtAuthFilter;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
