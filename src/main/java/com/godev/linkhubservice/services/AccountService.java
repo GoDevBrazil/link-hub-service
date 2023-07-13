@@ -10,4 +10,6 @@ public interface AccountService {
     AccountResponse register(AccountRequest accountRequest);
 
     UserDetails auth(AuthRequest authRequest);
+
+    AccountResponse findByEmail(String email);
 }
