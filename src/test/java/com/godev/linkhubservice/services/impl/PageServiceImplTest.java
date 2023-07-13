@@ -76,9 +76,30 @@ class PageServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return Page Response when save success")
-    void pageHappyPath(){
+    @DisplayName("Should return Page Response when save success with backgroundType color.")
+    void createPageHappyPath(){
         //arrange
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.create(this.mockedCreatePageRequest);
+
+        //assert
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.pageRepository, times(1)).save(any());
+        verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when save success with backgroundType image.")
+    void createPageHappyPath2(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withBackgroundTypeImage().withValidUrlBackgroundValue().build();
+
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);

@@ -1,4 +1,4 @@
-package com.godev.linkhubservice.domain.services;
+package com.godev.linkhubservice.services;
 
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;

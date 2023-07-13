@@ -1,9 +1,9 @@
 package com.godev.linkhubservice.rest.controllers.impl;
 
-import com.godev.linkhubservice.domain.services.PageService;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.rest.controllers.PageController;
+import com.godev.linkhubservice.services.PageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

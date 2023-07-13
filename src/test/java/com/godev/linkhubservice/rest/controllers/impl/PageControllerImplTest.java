@@ -3,7 +3,7 @@ package com.godev.linkhubservice.rest.controllers.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.domain.services.PageService;
+import com.godev.linkhubservice.services.PageService;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
