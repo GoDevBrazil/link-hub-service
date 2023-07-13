@@ -12,4 +12,4 @@ ENV DATABASE_PASS=$DATABASE_PASS
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=production","-jar","/app.jar"]
