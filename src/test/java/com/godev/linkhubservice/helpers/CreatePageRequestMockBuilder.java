@@ -67,6 +67,13 @@ public class CreatePageRequestMockBuilder {
 
         return this;
     }
+
+    public CreatePageRequestMockBuilder withValidUrlBackgroundValue() {
+
+        this.createPageRequest.setBackgroundValue("https://i.imgur.com/36bRmSn.jpeg");
+
+        return this;
+    }
     public CreatePageRequestMockBuilder withNullPhoto() {
 
         this.createPageRequest.setPhoto(null);
