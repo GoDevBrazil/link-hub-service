@@ -1,4 +1,4 @@
-package com.godev.linkhubservice.domain.services.impl;
+package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
@@ -6,10 +6,10 @@ import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
-import com.godev.linkhubservice.domain.services.AccountService;
 import com.godev.linkhubservice.domain.services.PageService;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.services.AccountService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
