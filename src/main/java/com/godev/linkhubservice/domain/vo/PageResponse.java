@@ -1,7 +1,6 @@
 package com.godev.linkhubservice.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.godev.linkhubservice.domain.models.Account;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +25,5 @@ public class PageResponse {
     private String backgroundValue;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private Account account;
 
 }

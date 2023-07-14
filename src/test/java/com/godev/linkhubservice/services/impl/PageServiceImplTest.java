@@ -117,7 +117,7 @@ class PageServiceImplTest {
 
     @Test
     @DisplayName("Should throw Rule Violation exception when Slug already exists")
-    void slugAlreadyExists(){
+    void createPageSlugAlreadyExists(){
         //arrange
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug()))
@@ -135,7 +135,7 @@ class PageServiceImplTest {
 
     @Test
     @DisplayName("Should return Page Response with default photo when Create Page Request has null Photo")
-    void nullPhoto(){
+    void createPageNullPhoto(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultPhoto().build();
@@ -159,7 +159,7 @@ class PageServiceImplTest {
 
     @Test
     @DisplayName("Should return Page Response with default Font Color when Create Page Request has null Font Color")
-    void nullFontColor(){
+    void createPageNullFontColor(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultFontColor().build();
@@ -183,7 +183,7 @@ class PageServiceImplTest {
 
     @Test
     @DisplayName("Should return Page Response with default Background Type Color when Create Page Request has null Background Type")
-    void nullBackgroundType(){
+    void createPageNullBackgroundType(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundTypeColor().build();
@@ -204,29 +204,9 @@ class PageServiceImplTest {
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
     }
-
-    @Test
-    @DisplayName("Should throw Rule Violation exception when Background Type field is different of Color and Image")
-    void backgroundTypeDifferentOfColorAndImage(){
-        //arrange
-        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidBackgroundType().build();
-
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
-        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
-
-        //action
-        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
-                () -> this.pageService.create(this.mockedCreatePageRequest));
-
-        //assert
-        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
-        Assertions.assertEquals(List.of(INVALID_BACKGROUND_TYPE_ERROR),
-                ruleViolationException.getIssue().getDetails());
-    }
-
     @Test
     @DisplayName("Should return Page Response with default Background Value when Create Page Request has null Background Value")
-    void nullBackgroundValue(){
+    void createPageNullBackgroundValue(){
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundValue().build();
@@ -246,6 +226,25 @@ class PageServiceImplTest {
         verify(this.pageRepository, times(1)).save(any());
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should throw Rule Violation exception when Background Type field is different of Color and Image")
+    void createPageBackgroundTypeIsNotColorAndImage(){
+        //arrange
+        this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidBackgroundType().build();
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.create(this.mockedCreatePageRequest));
+
+        //assert
+        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(INVALID_BACKGROUND_TYPE_ERROR),
+                ruleViolationException.getIssue().getDetails());
     }
 
     @Test

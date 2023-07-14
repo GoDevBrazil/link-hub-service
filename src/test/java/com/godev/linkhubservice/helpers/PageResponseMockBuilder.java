@@ -26,8 +26,6 @@ public class PageResponseMockBuilder {
         this.pageResponse.setBackgroundValue("#193153");
         this.pageResponse.setCreatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
         this.pageResponse.setUpdatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
-        var account = AccountMockBuilder.getBuilder().mock().build();
-        this.pageResponse.setAccount(account);
 
         return this;
     }
