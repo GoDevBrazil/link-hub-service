@@ -58,7 +58,7 @@ jobs:
           sonar_url: "https://sonarcloud.io"
           sonar_branch: "main"
           sonar_token: ${{ secrets.SONAR_TOKEN }}
-          project_key: "GoDevBrazil_link-hub-service"
+          project_key: "jecesario_test-pipeline-service"
 
       - name: 🔐 Docker Login
         uses: docker/login-action@v2.1.0
