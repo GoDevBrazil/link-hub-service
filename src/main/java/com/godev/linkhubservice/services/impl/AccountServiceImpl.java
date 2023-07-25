@@ -11,7 +11,9 @@ import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +30,7 @@ import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CRE
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
+@Slf4j
 public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;
@@ -41,6 +44,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public AccountResponse register(AccountRequest accountRequest) {
+
+        log.info("Verifying if email {} already exists.", accountRequest.getEmail());
 
         if(this.accountExists(accountRequest.getEmail())) {
             throw new RuleViolationException(
@@ -56,6 +61,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .build();
+
+        log.info("Starting saving account {} in database.", account.getName());
 
         var accountSaved = accountRepository.save(account);
 
@@ -81,6 +88,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         );
     }
 
+    // TODO logar findByEmail
     @Override
     public AccountResponse findByEmail(String email) {
         Account account = this.accountRepository.findByEmail(email)
