@@ -49,6 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Issue handlerObjectNotFoundException(ObjectNotFoundException e){
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 

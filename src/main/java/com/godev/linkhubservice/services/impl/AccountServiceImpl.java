@@ -7,13 +7,12 @@ import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
-import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
+import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -88,13 +87,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         );
     }
 
-    // TODO logar findByEmail
     @Override
     public AccountResponse findByEmail(String email) {
+
+        log.info("Finding e-mail {}", email);
+
         Account account = this.accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException(
                         new Issue(OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
                 ));
+
+        log.info("E-mail {} found", email);
 
         return AccountResponse
                 .builder()
