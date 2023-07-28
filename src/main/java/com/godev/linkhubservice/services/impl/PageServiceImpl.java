@@ -10,6 +10,7 @@ import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -31,6 +32,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVA
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 
 @Service
+@Slf4j
 public class PageServiceImpl implements PageService {
 
     private final PageRepository pageRepository;
@@ -44,10 +46,14 @@ public class PageServiceImpl implements PageService {
     @Override
     public PageResponse create(CreatePageRequest createPageRequest) {
 
+        log.info("Verifying if user is authenticated.");
+
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var accountResponse = accountService.findByEmail(userDetails.getUsername());
         var account = new Account();
         account.setId(accountResponse.getId());
+
+        log.info("Verifying if slug {} already exists.", createPageRequest.getSlug());
 
         this.pageRepository.findBySlug(createPageRequest.getSlug())
                 .ifPresent(page -> {
@@ -56,7 +62,11 @@ public class PageServiceImpl implements PageService {
                     );
                 });
 
+        log.info("Verifying if obligatory fields are missing. ");
+
         setDefaultValues(createPageRequest);
+
+        log.info("Validating background type.");
 
         validateBackgroundType(createPageRequest);
 
@@ -74,7 +84,10 @@ public class PageServiceImpl implements PageService {
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .build();
 
+        log.info("Starting saving page {} in database.", page.getSlug());
+
         var pageSaved = pageRepository.save(page);
+
 
         return PageResponse
                 .builder()
