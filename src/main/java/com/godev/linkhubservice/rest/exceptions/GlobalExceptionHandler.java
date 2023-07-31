@@ -6,6 +6,7 @@ import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -40,24 +42,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuleViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Issue handlerRuleViolationException(RuleViolationException e){
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Issue handlerObjectNotFoundException(ObjectNotFoundException e){
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Issue handlerBadRequestException(BadRequestException e) {
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 
     @ExceptionHandler(InvalidJwtException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Issue handlerInvalidJwtException(InvalidJwtException e) {
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 }

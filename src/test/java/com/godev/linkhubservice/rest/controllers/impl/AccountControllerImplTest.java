@@ -244,7 +244,7 @@ class AccountControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.HEADER_REQUIRED_ERROR, GENERATE_AUTH_TOKEN_ERROR))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.AUTHENTICATION_ERROR, GENERATE_AUTH_TOKEN_ERROR))));
 
     }
 
