@@ -93,34 +93,27 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         log.info("Finding e-mail {}", email);
 
-        Account account = this.accountRepository.findByEmail(email)
+        return this.accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException(
                         new Issue(OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
                 ));
 
-        log.info("E-mail {} found", email);
-
-        return Account
-                .builder()
-                .withId(account.getId())
-                .withName(account.getName())
-                .withEmail(account.getEmail())
-                .withPassword(account.getPassword())
-                .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .build();
     }
 
     @Override
     public AccountResponse update(AccountRequest accountRequest) {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var accountResponse = findByEmail(userDetails.getUsername());
+        var account = findByEmail(userDetails.getUsername());
 
-        accountResponse.setName(accountRequest.getName());
-        accountResponse.setEmail(accountRequest.getEmail());
-        accountResponse.setPassword(accountRequest.getPassword());
+        //disparar exceção já existente de email duplicado
+        //se o email que estiver vindo na requisição for o mesmo já cadastrado criar regra para passar
 
-        var accountUpdated = accountRepository.save(accountResponse);
+        account.setName(accountRequest.getName());
+        account.setEmail(accountRequest.getEmail());
+        account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+        var accountUpdated = accountRepository.save(account);
 
         return AccountResponse
                 .builder()

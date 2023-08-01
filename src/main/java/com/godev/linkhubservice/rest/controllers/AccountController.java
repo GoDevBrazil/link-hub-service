@@ -37,6 +37,6 @@ public interface AccountController {
     @PostMapping(value = "/auth")
     ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
 
-    @PutMapping(value = "/account")
+    @PutMapping
     ResponseEntity<AccountResponse> update(@RequestBody AccountRequest accountRequest);
 }

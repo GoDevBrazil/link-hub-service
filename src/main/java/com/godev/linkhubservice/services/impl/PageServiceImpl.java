@@ -3,7 +3,6 @@ package com.godev.linkhubservice.services.impl;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
-import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
@@ -49,9 +48,7 @@ public class PageServiceImpl implements PageService {
         log.info("Verifying if user is authenticated.");
 
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var accountResponse = accountService.findByEmail(userDetails.getUsername());
-        var account = new Account();
-        account.setId(accountResponse.getId());
+        var account = accountService.findByEmail(userDetails.getUsername());
 
         log.info("Verifying if slug {} already exists.", createPageRequest.getSlug());
 
