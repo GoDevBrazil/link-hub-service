@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "Accounts", description = "Make Account operations")
 public interface AccountController {
@@ -35,4 +36,7 @@ public interface AccountController {
     })
     @PostMapping(value = "/auth")
     ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
+
+    @PutMapping(value = "/account")
+    ResponseEntity<AccountResponse> update(@RequestBody AccountRequest accountRequest);
 }

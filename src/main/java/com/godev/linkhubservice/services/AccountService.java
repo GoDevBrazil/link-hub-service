@@ -1,5 +1,6 @@
 package com.godev.linkhubservice.services;
 
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
@@ -11,5 +12,7 @@ public interface AccountService {
 
     UserDetails auth(AuthRequest authRequest);
 
-    AccountResponse findByEmail(String email);
+    Account findByEmail(String email);
+
+    AccountResponse update(AccountRequest accountRequest);
 }
