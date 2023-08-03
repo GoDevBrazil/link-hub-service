@@ -105,18 +105,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
-        if(this.accountExists(accountRequest.getEmail())) {
+        if(accountRequest.getEmail().equals(account.getEmail())) {
+            account.setName(accountRequest.getName());
+            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        }
+        else if(this.accountExists(accountRequest.getEmail())) {
             throw new RuleViolationException(
                     new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, accountRequest.getEmail()))
             );
         }
-        //se o email que estiver vindo na requisição for o mesmo já cadastrado criar regra para passar
-
-        if(accountRequest.getEmail().equals(account.getEmail())){
-            account.setName(accountRequest.getName());
-            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
-            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        }else{
+        else{
                 account.setName(accountRequest.getName());
                 account.setEmail(accountRequest.getEmail());
                 account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
