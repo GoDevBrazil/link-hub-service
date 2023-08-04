@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     @Override
     public AccountResponse register(AccountRequest accountRequest) {
 
-        log.info("Verifying if email {} already exists.", accountRequest.getEmail());
+        log.info("Verifying if email {} already registered", accountRequest.getEmail());
 
         if(this.accountExists(accountRequest.getEmail())) {
             throw new RuleViolationException(
@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .build();
 
-        log.info("Starting saving account {} in database.", account.getName());
+        log.info("Starting saving account {} in database", account.getName());
 
         var accountSaved = accountRepository.save(account);
 
@@ -105,6 +105,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
+        log.info("Verifying if e-mail {} already registered", accountRequest.getEmail());
+
         if(accountRequest.getEmail().equals(account.getEmail())) {
             account.setName(accountRequest.getName());
             account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
@@ -122,6 +124,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
         }
 
+        log.info("Saving changes in database");
 
         var accountUpdated = accountRepository.save(account);
 
