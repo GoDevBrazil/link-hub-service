@@ -32,6 +32,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -330,6 +331,23 @@ class AccountControllerImplTest {
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should update account when account request valid body is passed")
+    void accountUpdateHappyPath() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
+        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
+
+        Mockito.when(this.accountService.update(accountRequest)).thenReturn(accountResponse);
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
     }
 }
