@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthResponseMockBuilder;
 import com.godev.linkhubservice.security.jwt.JwtService;
+import com.godev.linkhubservice.services.impl.AccountServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.DateTimeException;
@@ -24,13 +26,7 @@ import java.util.List;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.GENERATE_AUTH_TOKEN_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.EMAIL_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.NAME_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.PASSWORD_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -50,11 +46,11 @@ class AccountControllerImplTest {
     private JwtService jwtService;
 
     @MockBean
-    private AccountService accountService;
+    private AccountServiceImpl accountService;
 
     @Test
     @DisplayName("Should register account when account request valid body is passed")
-    void accountControllerHappyPath() throws Exception {
+    void registerHappyPath() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
@@ -71,7 +67,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request name field is null")
-    void nullNameField() throws Exception {
+    void registerNullNameField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullName().build();
 
@@ -85,7 +81,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request name field has invalid length")
-    void invalidLengthNameField() throws Exception {
+    void registerInvalidLengthNameField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
 
@@ -99,7 +95,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request name field is empty")
-    void emptyNameField() throws Exception {
+    void registerEmptyNameField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
 
@@ -114,7 +110,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request email field is null")
-    void nullEmailField() throws Exception {
+    void registerNullEmailField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
 
@@ -128,7 +124,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request email field is invalid")
-    void invalidEmailField() throws Exception {
+    void registerInvalidEmailField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
 
@@ -142,7 +138,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request email field has invalid length")
-    void invalidLengthEmailField() throws Exception {
+    void registerInvalidLengthEmailField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
 
@@ -156,7 +152,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request password field is null")
-    void nullPasswordField() throws Exception {
+    void registerNullPasswordField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
 
@@ -170,7 +166,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request password field is invalid")
-    void invalidPasswordField() throws Exception {
+    void registerInvalidPasswordField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
 
@@ -184,7 +180,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request when account request password field has invalid length")
-    void invalidLengthPasswordField() throws Exception {
+    void registerInvalidLengthPasswordField() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
 
@@ -198,7 +194,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should authenticate account when auth request valid body is passed")
-    void authenticateAccountHappyPath() throws Exception {
+    void authAccountHappyPath() throws Exception {
 
         final var authRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var authResponse = AuthResponseMockBuilder.getBuilder().mock().build();
@@ -216,7 +212,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw bad request exception when authentication fails")
-    void authenticationFails() throws Exception {
+    void authFails() throws Exception {
 
         final var authRequest = AuthRequestMockBuilder.getBuilder().mock().build();
         final var exception = new BadRequestException(
@@ -234,7 +230,7 @@ class AccountControllerImplTest {
 
     @Test
     @DisplayName("Should throw invalid jwt exception when generate token fails")
-    void generateTokenFails() throws Exception {
+    void authGenerateTokenFails() throws Exception {
 
         final var authRequest = AuthRequestMockBuilder.getBuilder().mock().build();
 
@@ -334,20 +330,175 @@ class AccountControllerImplTest {
 
     }
 
+    @BeforeEach
+    void setup(){
+        final var token = "kibe";
+        final var userDetails = User.builder().username("kibe@email.com").password("123").roles("USER").build();
+
+        Mockito.when(this.jwtService.isValidToken(token)).thenReturn(Boolean.TRUE);
+        Mockito.when(this.jwtService.getLoggedAccount(token)).thenReturn("kibe@email.com");
+        Mockito.when(this.accountService.loadUserByUsername("kibe@email.com")).thenReturn(userDetails);
+    }
+
     @Test
     @DisplayName("Should update account when account request valid body is passed")
     void accountUpdateHappyPath() throws Exception {
 
         final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
         final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
 
         Mockito.when(this.accountService.update(accountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request name field is null")
+    void accountUpdateNullNameField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullName().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request name field has invalid length")
+    void accountUpdateInvalidLengthNameField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request name field is empty")
+    void accountUpdateEmptyNameField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR)))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request email field is null")
+    void accountUpdateNullEmailField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request email field is invalid")
+    void accountUpdateInvalidEmailField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request email field has invalid length")
+    void accountUpdateInvalidLengthEmailField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request password field is null")
+    void accountUpdateNullPasswordField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request password field is invalid")
+    void accountUpdateInvalidPasswordField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
+
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when update account request password field has invalid length")
+    void accountUpdateInvalidLengthPasswordField() throws Exception {
+
+        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
+        final var bearerToken = "Bearer kibe";
+
+        mockMvc.perform(put("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
 
     }
 }
