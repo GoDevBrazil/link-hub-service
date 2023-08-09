@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
-import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
-import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
-import com.godev.linkhubservice.helpers.AuthResponseMockBuilder;
+import com.godev.linkhubservice.helpers.*;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -344,15 +341,15 @@ class AccountControllerImplTest {
     @DisplayName("Should update account when account request valid body is passed")
     void accountUpdateHappyPath() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
         final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(accountRequest)).thenReturn(accountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
@@ -362,12 +359,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request name field is null")
     void accountUpdateNullNameField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullName().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullName().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR))));
@@ -394,15 +391,15 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request name field is empty")
     void accountUpdateEmptyNameField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR)))));
+                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
 
     }
 

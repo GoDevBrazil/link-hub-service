@@ -10,6 +10,7 @@ import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
 import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -101,28 +102,26 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public AccountResponse update(AccountRequest accountRequest) {
+    public AccountResponse update(UpdateAccountRequest updateAccountRequest) {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
-        log.info("Verifying if e-mail {} already registered", accountRequest.getEmail());
+        log.info("Verifying if e-mail {} already registered", updateAccountRequest.getEmail());
 
-        if(accountRequest.getEmail().equals(account.getEmail())) {
-            account.setName(accountRequest.getName());
-            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
-            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        }
-        else if(this.accountExists(accountRequest.getEmail())) {
+        if(!updateAccountRequest.getEmail().equals(account.getEmail()) && this.accountExists(updateAccountRequest.getEmail())) {
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, accountRequest.getEmail()))
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, updateAccountRequest.getEmail()))
             );
         }
-        else{
-                account.setName(accountRequest.getName());
-                account.setEmail(accountRequest.getEmail());
-                account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
-                account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getName())){
+            updateAccountRequest.setName(account.getName());
         }
+
+        account.setName(updateAccountRequest.getName());
+        account.setEmail(updateAccountRequest.getEmail());
+        account.setPassword(passwordEncoder.encode(updateAccountRequest.getPassword()));
+        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
         log.info("Saving changes in database");
 

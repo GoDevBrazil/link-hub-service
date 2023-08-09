@@ -4,10 +4,7 @@ import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.InvalidJwtException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.domain.vo.AccountRequest;
-import com.godev.linkhubservice.domain.vo.AccountResponse;
-import com.godev.linkhubservice.domain.vo.AuthRequest;
-import com.godev.linkhubservice.domain.vo.AuthResponse;
+import com.godev.linkhubservice.domain.vo.*;
 import com.godev.linkhubservice.rest.controllers.AccountController;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import com.godev.linkhubservice.services.AccountService;
@@ -74,11 +71,11 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> update(AccountRequest accountRequest) {
+    public ResponseEntity<AccountResponse> update(UpdateAccountRequest updateAccountRequest) {
 
-        log.info("Starting update of account {}", accountRequest.getName());
+        log.info("Starting update of account {}", updateAccountRequest.getName());
 
-        var accountResponse = accountService.update(accountRequest);
+        var accountResponse = accountService.update(updateAccountRequest);
 
         log.info("Account update successful");
 
