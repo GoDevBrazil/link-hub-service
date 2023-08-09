@@ -102,13 +102,27 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public AccountResponse update(AccountRequest accountRequest) {
-
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
         log.info("Verifying if e-mail {} already registered", accountRequest.getEmail());
 
-        emailUpdateValidation(accountRequest, account);
+        if(accountRequest.getEmail().equals(account.getEmail())) {
+            account.setName(accountRequest.getName());
+            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        }
+        else if(this.accountExists(accountRequest.getEmail())) {
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, accountRequest.getEmail()))
+            );
+        }
+        else{
+                account.setName(accountRequest.getName());
+                account.setEmail(accountRequest.getEmail());
+                account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+                account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        }
 
         log.info("Saving changes in database");
 
@@ -143,29 +157,4 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                         .build();
     }
 
-    private void emailUpdateValidation(AccountRequest accountRequest, Account account){
-        if(accountRequest.getEmail().equals(account.getEmail())) {
-            nameUpdateValidation(accountRequest, account);
-            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
-            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        }
-        else if(this.accountExists(accountRequest.getEmail())) {
-            throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, accountRequest.getEmail()))
-            );
-        }
-        else{
-            nameUpdateValidation(accountRequest, account);
-            account.setEmail(accountRequest.getEmail());
-            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
-            account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        }
-    }
-
-    private void nameUpdateValidation(AccountRequest accountRequest, Account account){
-        if(ObjectUtils.isEmpty(accountRequest.getName())){
-            account.setName(account.getName());
-        }
-        account.setName(accountRequest.getName());
-    }
 }
