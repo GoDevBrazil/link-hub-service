@@ -222,6 +222,15 @@ class AccountServiceImplTest {
     @Test
     @DisplayName("Should update account when account request valid body is passed")
     void accountUpdateHappyPath(){
-        when(this.mockedAccount.)
+
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.accountRepository.save(this.mockedAccount)).thenReturn(this.mockedUpdatedAccount);
+
+        final var updateAccountResponse = this.accountService.update(this.mockedUpdateAccountRequest);
+
+        Assertions.assertNotNull(updateAccountResponse);
+        Assertions.assertEquals(this.mockedUpdatedAccount.getId(), updateAccountResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.accountRepository, times(1)).save(this.mockedAccount);
     }
 }
