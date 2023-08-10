@@ -35,5 +35,5 @@ public interface AccountController {
     ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
 
     @PutMapping
-    ResponseEntity<AccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
+    ResponseEntity<UpdateAccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
 }

@@ -71,14 +71,14 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> update(UpdateAccountRequest updateAccountRequest) {
+    public ResponseEntity<UpdateAccountResponse> update(UpdateAccountRequest updateAccountRequest) {
 
         log.info("Starting update of account {}", updateAccountRequest.getName());
 
-        var accountResponse = accountService.update(updateAccountRequest);
+        var updateAccountResponse = accountService.update(updateAccountRequest);
 
         log.info("Account update successful");
 
-        return ResponseEntity.status(HttpStatus.OK).body(accountResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(updateAccountResponse);
     }
 }

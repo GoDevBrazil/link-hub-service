@@ -342,32 +342,34 @@ class AccountControllerImplTest {
     void accountUpdateHappyPath() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
-        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
+        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
 
     }
 
     @Test
-    @DisplayName("Should throw bad request when update account request name field is null")
+    @DisplayName("Should update account with same name when update account request name field is null")
     void accountUpdateNullNameField() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullName().build();
+        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR))));
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
 
     }
 
@@ -375,12 +377,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request name field has invalid length")
     void accountUpdateInvalidLengthNameField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
@@ -404,18 +406,20 @@ class AccountControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request when update account request email field is null")
+    @DisplayName("Should update account with same email when update account request email field is null")
     void accountUpdateNullEmailField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
+        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))));
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
 
     }
 
@@ -423,12 +427,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request email field is invalid")
     void accountUpdateInvalidEmailField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
@@ -439,12 +443,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request email field has invalid length")
     void accountUpdateInvalidLengthEmailField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
@@ -452,18 +456,20 @@ class AccountControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request when update account request password field is null")
+    @DisplayName("Should update account with same password when update account request password field is null")
     void accountUpdateNullPasswordField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
+        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR))));
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
 
     }
 
@@ -471,12 +477,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request password field is invalid")
     void accountUpdateInvalidPasswordField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
@@ -487,12 +493,12 @@ class AccountControllerImplTest {
     @DisplayName("Should throw bad request when update account request password field has invalid length")
     void accountUpdateInvalidLengthPasswordField() throws Exception {
 
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
+        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)).header("Authorization", bearerToken))
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));

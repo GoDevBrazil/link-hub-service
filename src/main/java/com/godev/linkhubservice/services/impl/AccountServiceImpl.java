@@ -7,10 +7,7 @@ import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
-import com.godev.linkhubservice.domain.vo.AccountRequest;
-import com.godev.linkhubservice.domain.vo.AccountResponse;
-import com.godev.linkhubservice.domain.vo.AuthRequest;
-import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
+import com.godev.linkhubservice.domain.vo.*;
 import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -102,11 +99,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public AccountResponse update(UpdateAccountRequest updateAccountRequest) {
+    public UpdateAccountResponse update(UpdateAccountRequest updateAccountRequest) {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
         log.info("Verifying if e-mail {} already registered", updateAccountRequest.getEmail());
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getEmail())){
+            updateAccountRequest.setEmail(account.getEmail());
+        }
 
         if(!updateAccountRequest.getEmail().equals(account.getEmail()) && this.accountExists(updateAccountRequest.getEmail())) {
             throw new RuleViolationException(
@@ -118,6 +119,10 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             updateAccountRequest.setName(account.getName());
         }
 
+        if(ObjectUtils.isEmpty(updateAccountRequest.getPassword())){
+            updateAccountRequest.setPassword(account.getPassword());
+        }
+
         account.setName(updateAccountRequest.getName());
         account.setEmail(updateAccountRequest.getEmail());
         account.setPassword(passwordEncoder.encode(updateAccountRequest.getPassword()));
@@ -127,7 +132,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         var accountUpdated = accountRepository.save(account);
 
-        return AccountResponse
+        return UpdateAccountResponse
                 .builder()
                 .withId(accountUpdated.getId())
                 .withName(accountUpdated.getName())
