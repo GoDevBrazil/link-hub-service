@@ -4,18 +4,27 @@ import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.repository.AccountRepository;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
+import com.godev.linkhubservice.helpers.UpdateAccountRequestMockBuilder;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -40,6 +49,18 @@ class AccountServiceImplTest {
     private PasswordEncoder passwordEncoder;
     @InjectMocks
     private AccountServiceImpl accountService;
+
+    UpdateAccountRequest mockedUpdateAccountRequest;
+
+    Account mockedAccount;
+
+    Account mockedUpdatedAccount;
+
+    UserDetails userDetails = User.builder()
+            .username("kibe@email.com")
+            .password("321")
+            .roles("USER")
+            .build();
 
     @Test
     @DisplayName("Should return Account Response when save success")
@@ -185,4 +206,22 @@ class AccountServiceImplTest {
         Assertions.assertEquals(String.format(EMAIL_NOT_FOUND_ERROR, mockedEmail), objectNotFoundException.getIssue().getDetails().get(0));
     }
 
+    @BeforeEach
+    void setup(){
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getPrincipal()).thenReturn(this.userDetails);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        this.mockedUpdateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
+        this.mockedAccount = AccountMockBuilder.getBuilder().mock().build();
+        this.mockedUpdatedAccount = AccountMockBuilder.getBuilder().mock().build();
+    }
+
+    @Test
+    @DisplayName("Should update account when account request valid body is passed")
+    void accountUpdateHappyPath(){
+        when(this.mockedAccount.)
+    }
 }
