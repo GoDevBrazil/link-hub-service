@@ -11,7 +11,6 @@ import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
 import com.godev.linkhubservice.helpers.UpdateAccountRequestMockBuilder;
-import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,14 +30,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_EXISTS_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.EMAIL_NOT_FOUND_ERROR;
-import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
@@ -50,6 +45,7 @@ class AccountServiceImplTest {
     @InjectMocks
     private AccountServiceImpl accountService;
 
+
     UpdateAccountRequest mockedUpdateAccountRequest;
 
     Account mockedAccount;
@@ -58,9 +54,22 @@ class AccountServiceImplTest {
 
     UserDetails userDetails = User.builder()
             .username("kibe@email.com")
-            .password("321")
+            .password("Kibe@1234")
             .roles("USER")
             .build();
+
+    @BeforeEach
+    void setup(){
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.lenient().when(authentication.getPrincipal()).thenReturn(this.userDetails);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        this.mockedUpdateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
+        this.mockedAccount = AccountMockBuilder.getBuilder().mock().build();
+        this.mockedUpdatedAccount = AccountMockBuilder.getBuilder().mock().build();
+    }
 
     @Test
     @DisplayName("Should return Account Response when save success")
@@ -206,31 +215,20 @@ class AccountServiceImplTest {
         Assertions.assertEquals(String.format(EMAIL_NOT_FOUND_ERROR, mockedEmail), objectNotFoundException.getIssue().getDetails().get(0));
     }
 
-    @BeforeEach
-    void setup(){
-        Authentication authentication = Mockito.mock(Authentication.class);
-        Mockito.when(authentication.getPrincipal()).thenReturn(this.userDetails);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-
-        this.mockedUpdateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
-        this.mockedAccount = AccountMockBuilder.getBuilder().mock().build();
-        this.mockedUpdatedAccount = AccountMockBuilder.getBuilder().mock().build();
-    }
-
     @Test
     @DisplayName("Should update account when account request valid body is passed")
     void accountUpdateHappyPath(){
-
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
+        //arrange
+        when(this.accountRepository.findByEmail(this.userDetails.getUsername())).thenReturn(Optional.ofNullable(this.mockedAccount));
         when(this.accountRepository.save(this.mockedAccount)).thenReturn(this.mockedUpdatedAccount);
 
+        //action
         final var updateAccountResponse = this.accountService.update(this.mockedUpdateAccountRequest);
 
+        //assert
         Assertions.assertNotNull(updateAccountResponse);
         Assertions.assertEquals(this.mockedUpdatedAccount.getId(), updateAccountResponse.getId());
-        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.accountRepository, times(1)).findByEmail(this.userDetails.getUsername());
         verify(this.accountRepository, times(1)).save(this.mockedAccount);
     }
 }
