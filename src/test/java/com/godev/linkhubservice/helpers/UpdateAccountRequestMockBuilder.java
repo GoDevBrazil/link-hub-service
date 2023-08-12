@@ -1,6 +1,5 @@
 package com.godev.linkhubservice.helpers;
 
-import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
 
 public class UpdateAccountRequestMockBuilder {
@@ -62,6 +61,13 @@ public class UpdateAccountRequestMockBuilder {
     public UpdateAccountRequestMockBuilder withInvalidLengthEmail() {
 
         this.updateAccountRequest.setEmail("a@a.c");
+
+        return this;
+    }
+
+    public UpdateAccountRequestMockBuilder withNewEmail() {
+
+        this.updateAccountRequest.setEmail("law@email.com");
 
         return this;
     }

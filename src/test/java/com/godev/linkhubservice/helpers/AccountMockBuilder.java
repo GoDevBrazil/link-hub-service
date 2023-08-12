@@ -34,6 +34,13 @@ public class AccountMockBuilder {
         return this;
     }
 
+    public AccountMockBuilder withNewEmail() {
+
+        this.account.setEmail("law@email.com");
+
+        return this;
+    }
+
     public Account build() {
         return account;
     }
