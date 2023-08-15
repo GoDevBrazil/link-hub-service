@@ -10,9 +10,12 @@ import com.godev.linkhubservice.domain.repository.AccountRepository;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,7 +47,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     @Override
     public AccountResponse register(AccountRequest accountRequest) {
 
-        log.info("Verifying if email {} already exists.", accountRequest.getEmail());
+        log.info("Verifying if email {} already registered", accountRequest.getEmail());
 
         if(this.accountExists(accountRequest.getEmail())) {
             throw new RuleViolationException(
@@ -61,7 +64,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .build();
 
-        log.info("Starting saving account {} in database.", account.getName());
+        log.info("Starting saving account {} in database", account.getName());
 
         var accountSaved = accountRepository.save(account);
 
@@ -88,20 +91,57 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public AccountResponse findByEmail(String email) {
+    public Account findByEmail(String email) {
 
         log.info("Finding e-mail {}", email);
 
-        Account account = this.accountRepository.findByEmail(email)
+        return this.accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException(
                         new Issue(OBJECT_NOT_FOUND, String.format(EMAIL_NOT_FOUND_ERROR, email))
                 ));
 
-        log.info("E-mail {} found", email);
+    }
 
-        return AccountResponse
+    @Override
+    public UpdateAccountResponse update(UpdateAccountRequest updateAccountRequest) {
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = findByEmail(userDetails.getUsername());
+
+        log.info("Validating request fields");
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getEmail())){
+            updateAccountRequest.setEmail(account.getEmail());
+        }
+
+        if(!updateAccountRequest.getEmail().equals(account.getEmail()) && this.accountExists(updateAccountRequest.getEmail())) {
+            throw new RuleViolationException(
+                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, updateAccountRequest.getEmail()))
+            );
+        }
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getName())){
+            updateAccountRequest.setName(account.getName());
+        }
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getPassword())){
+            updateAccountRequest.setPassword(account.getPassword());
+        }
+
+        account.setName(updateAccountRequest.getName());
+        account.setEmail(updateAccountRequest.getEmail());
+        account.setPassword(passwordEncoder.encode(updateAccountRequest.getPassword()));
+        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+        log.info("Saving changes in database");
+
+        var accountUpdated = accountRepository.save(account);
+
+        return UpdateAccountResponse
                 .builder()
-                .withId(account.getId())
+                .withId(accountUpdated.getId())
+                .withName(accountUpdated.getName())
+                .withEmail(accountUpdated.getEmail())
+                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
                 .build();
     }
 

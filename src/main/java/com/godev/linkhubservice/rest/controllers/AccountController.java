@@ -4,6 +4,8 @@ import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.AuthResponse;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "Accounts", description = "Make Account operations")
 public interface AccountController {
@@ -35,4 +38,7 @@ public interface AccountController {
     })
     @PostMapping(value = "/auth")
     ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
+
+    @PutMapping
+    ResponseEntity<UpdateAccountResponse> update(@RequestBody @Valid UpdateAccountRequest updateAccountRequest);
 }

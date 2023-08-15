@@ -8,6 +8,8 @@ import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.AuthResponse;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import com.godev.linkhubservice.rest.controllers.AccountController;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import com.godev.linkhubservice.services.AccountService;
@@ -71,5 +73,17 @@ public class AccountControllerImpl implements AccountController {
                     new Issue(IssueEnum.AUTHENTICATION_ERROR, GENERATE_AUTH_TOKEN_ERROR)
             );
         }
+    }
+
+    @Override
+    public ResponseEntity<UpdateAccountResponse> update(UpdateAccountRequest updateAccountRequest) {
+
+        log.info("Starting update of account {}", updateAccountRequest.getName());
+
+        var updateAccountResponse = accountService.update(updateAccountRequest);
+
+        log.info("Account update successful");
+
+        return ResponseEntity.ok(updateAccountResponse);
     }
 }

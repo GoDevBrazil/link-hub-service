@@ -2,10 +2,11 @@ package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
-import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
+import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageMockBuilder;
@@ -54,7 +55,7 @@ class PageServiceImplTest {
     private PageServiceImpl pageService;
 
     CreatePageRequest mockedCreatePageRequest;
-    AccountResponse mockedAccountResponse;
+    Account mockedAccount;
     Page mockedPageSaved;
     UserDetails userDetails = User.builder()
             .username("kibe@email.com")
@@ -71,7 +72,7 @@ class PageServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
-        this.mockedAccountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
+        this.mockedAccount = AccountMockBuilder.getBuilder().mock().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
     }
 
@@ -79,7 +80,7 @@ class PageServiceImplTest {
     @DisplayName("Should return Page Response when save success with backgroundType color.")
     void createPageHappyPath(){
         //arrange
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -100,7 +101,7 @@ class PageServiceImplTest {
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withBackgroundTypeImage().withValidUrlBackgroundValue().build();
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -119,7 +120,7 @@ class PageServiceImplTest {
     @DisplayName("Should throw Rule Violation exception when Slug already exists")
     void createPageSlugAlreadyExists(){
         //arrange
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug()))
                 .thenReturn(Optional.of(this.mockedPageSaved));
 
@@ -141,7 +142,7 @@ class PageServiceImplTest {
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultPhoto().build();
 
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -165,7 +166,7 @@ class PageServiceImplTest {
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultFontColor().build();
 
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -189,7 +190,7 @@ class PageServiceImplTest {
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundTypeColor().build();
 
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -212,7 +213,7 @@ class PageServiceImplTest {
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withDefaultBackgroundValue().build();
 
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
@@ -234,7 +235,7 @@ class PageServiceImplTest {
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidBackgroundType().build();
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
 
         //action
@@ -253,7 +254,7 @@ class PageServiceImplTest {
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build();
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
 
         //action
@@ -272,7 +273,7 @@ class PageServiceImplTest {
         //arrange
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().withBackgroundTypeImage().withInvalidUrlFormatPhoto().build();
 
-        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccountResponse);
+        when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
 
         //action
