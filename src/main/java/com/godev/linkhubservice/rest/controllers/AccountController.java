@@ -37,8 +37,8 @@ public interface AccountController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping(value = "/auth")
-    ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
+    ResponseEntity<AuthResponse> auth(@Valid @RequestBody AuthRequest authRequest);
 
     @PutMapping
-    ResponseEntity<UpdateAccountResponse> update(@RequestBody @Valid UpdateAccountRequest updateAccountRequest);
+    ResponseEntity<UpdateAccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
 }

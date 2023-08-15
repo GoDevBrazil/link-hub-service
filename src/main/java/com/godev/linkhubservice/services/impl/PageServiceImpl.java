@@ -7,6 +7,7 @@ import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,17 @@ public class PageServiceImpl implements PageService {
                 .withCreatedAt(pageSaved.getCreatedAt())
                 .withUpdatedAt(pageSaved.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    public PageResponse update(UpdatePageRequest updatePageRequest, Integer id) {
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = accountService.findByEmail(userDetails.getUsername());
+
+        // TODO implementar findById no PageService para retornar exceção (404) caso não encontre a Page
+        var page = pageRepository.findById(id);
+
+        return null;
     }
 
     private void validateBackgroundType(CreatePageRequest createPageRequest) {
