@@ -39,6 +39,13 @@ public interface AccountController {
     @PostMapping(value = "/auth")
     ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
 
+    @Operation(description = "Edit an account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return an account recently updated"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PutMapping
     ResponseEntity<UpdateAccountResponse> update(@RequestBody @Valid UpdateAccountRequest updateAccountRequest);
 }
