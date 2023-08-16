@@ -13,5 +13,6 @@ public class IssueDetails {
     public static final String  INVALID_CREDENTIALS_ERROR = "Usuário e/ou senha inválidos.";
 
     public static final String  EMAIL_NOT_FOUND_ERROR = "Conta com o email '%s' não encontrada.";
+    public static final String  ID_NOT_FOUND_ERROR = "Página com o ID '%s' não encontrada.";
 
 }

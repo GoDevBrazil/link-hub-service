@@ -2,6 +2,7 @@ package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
@@ -24,12 +25,14 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.PAGE_BACKGROUND_TYPE_IMAGE;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
 @Slf4j
@@ -107,10 +110,50 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = accountService.findByEmail(userDetails.getUsername());
 
-        // TODO implementar findById no PageService para retornar exceção (404) caso não encontre a Page
+        this.pageRepository.findBySlug(updatePageRequest.getSlug())
+                .ifPresent(page -> {
+                    throw new RuleViolationException(
+                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug()))
+                    );
+                });
+
         var page = pageRepository.findById(id);
 
-        return null;
+
+        if (page.isPresent()) {
+            page.get().setSlug(updatePageRequest.getSlug());
+            page.get().setTitle(updatePageRequest.getTitle());
+            page.get().setDescription(updatePageRequest.getDescription());
+            page.get().setPhoto(updatePageRequest.getPhoto());
+            page.get().setFontColor(updatePageRequest.getFontColor());
+            page.get().setBackgroundType(updatePageRequest.getBackgroundType());
+            page.get().setBackgroundValue(updatePageRequest.getBackgroundValue());
+            page.get().setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        }
+
+        var pageUpdated = pageRepository.save(page.get());
+
+        return  PageResponse
+                .builder()
+                .withId(pageUpdated.getId())
+                .withSlug(pageUpdated.getSlug())
+                .withTitle(pageUpdated.getTitle())
+                .withDescription(pageUpdated.getDescription())
+                .withPhoto(pageUpdated.getPhoto())
+                .withFontColor(pageUpdated.getFontColor())
+                .withBackgroundType(pageUpdated.getBackgroundType())
+                .withBackgroundValue(pageUpdated.getBackgroundValue())
+                .withUpdatedAt(pageUpdated.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    public Page findById(Integer id) {
+
+        return this.pageRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
+                ));
     }
 
     private void validateBackgroundType(CreatePageRequest createPageRequest) {
