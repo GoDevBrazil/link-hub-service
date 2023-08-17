@@ -110,28 +110,31 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = accountService.findByEmail(userDetails.getUsername());
 
-        this.pageRepository.findBySlug(updatePageRequest.getSlug())
-                .ifPresent(page -> {
-                    throw new RuleViolationException(
-                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug()))
-                    );
-                });
+//        this.pageRepository.findBySlug(updatePageRequest.getSlug())
+//                .ifPresent(page -> {
+//                    throw new RuleViolationException(
+//                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug()))
+//                    );
+//                });
 
-        var page = pageRepository.findById(id);
+        var page = findById(id);
+
+        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  ){}
 
 
-        if (page.isPresent()) {
-            page.get().setSlug(updatePageRequest.getSlug());
-            page.get().setTitle(updatePageRequest.getTitle());
-            page.get().setDescription(updatePageRequest.getDescription());
-            page.get().setPhoto(updatePageRequest.getPhoto());
-            page.get().setFontColor(updatePageRequest.getFontColor());
-            page.get().setBackgroundType(updatePageRequest.getBackgroundType());
-            page.get().setBackgroundValue(updatePageRequest.getBackgroundValue());
-            page.get().setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        }
 
-        var pageUpdated = pageRepository.save(page.get());
+
+        page.setSlug(updatePageRequest.getSlug());
+        page.setTitle(updatePageRequest.getTitle());
+        page.setDescription(updatePageRequest.getDescription());
+        page.setPhoto(updatePageRequest.getPhoto());
+        page.setFontColor(updatePageRequest.getFontColor());
+        page.setBackgroundType(updatePageRequest.getBackgroundType());
+        page.setBackgroundValue(updatePageRequest.getBackgroundValue());
+        page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+
+        var pageUpdated = pageRepository.save(page);
 
         return  PageResponse
                 .builder()
