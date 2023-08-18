@@ -110,19 +110,9 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = accountService.findByEmail(userDetails.getUsername());
 
-//        this.pageRepository.findBySlug(updatePageRequest.getSlug())
-//                .ifPresent(page -> {
-//                    throw new RuleViolationException(
-//                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug()))
-//                    );
-//                });
-
         var page = findById(id);
 
-        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  ){}
-
-
-
+        validateSlug(updatePageRequest, page);
 
         page.setSlug(updatePageRequest.getSlug());
         page.setTitle(updatePageRequest.getTitle());
@@ -150,6 +140,17 @@ public class PageServiceImpl implements PageService {
                 .build();
     }
 
+    private void validateSlug(UpdatePageRequest updatePageRequest, Page page) {
+        if(ObjectUtils.isEmpty(updatePageRequest.getSlug())){
+            updatePageRequest.setSlug(page.getSlug());
+        }
+
+        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  && slugExists(updatePageRequest)){
+            throw new RuleViolationException(
+                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
+        }
+    }
+
     @Override
     public Page findById(Integer id) {
 
@@ -157,6 +158,11 @@ public class PageServiceImpl implements PageService {
                 .orElseThrow(() -> new ObjectNotFoundException(
                         new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
                 ));
+    }
+
+    private boolean slugExists(UpdatePageRequest updatePageRequest){
+        var slug = pageRepository.findBySlug(updatePageRequest.getSlug()).orElse(null);
+        return ObjectUtils.isNotEmpty(slug);
     }
 
     private void validateBackgroundType(CreatePageRequest createPageRequest) {
