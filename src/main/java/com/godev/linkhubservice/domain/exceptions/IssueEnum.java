@@ -5,7 +5,8 @@ public enum IssueEnum {
     FORMAT_REQUEST_NOT_VALID("O formato da requisição não é suportado."),
     OBJECT_NOT_FOUND("O objeto da requisição não pode ser encontrado no banco de dados."),
     HEADER_REQUIRED_ERROR("Um erro ocorreu durante a validação dos headers obrigatórios"),
-    AUTHENTICATION_ERROR("Um erro ocorreu durante a autenticação do usuário")
+    AUTHENTICATION_ERROR("Um erro ocorreu durante a autenticação do usuário"),
+    FORBIDEN("Um erro ocorreu durante a validação de autorizações")
     ;
 
     private final String message;

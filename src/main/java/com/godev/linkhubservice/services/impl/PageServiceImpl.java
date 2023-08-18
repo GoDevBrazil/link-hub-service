@@ -1,9 +1,10 @@
 package com.godev.linkhubservice.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.ForbidenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
-import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
@@ -27,11 +28,14 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.PAGE_BACKGROUND_TYPE_IMAGE;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
@@ -52,24 +56,24 @@ public class PageServiceImpl implements PageService {
         log.info("Verifying if user is authenticated.");
 
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var account = accountService.findByEmail(userDetails.getUsername());
+        var account = this.accountService.findByEmail(userDetails.getUsername());
 
         log.info("Verifying if slug {} already exists.", createPageRequest.getSlug());
 
         this.pageRepository.findBySlug(createPageRequest.getSlug())
                 .ifPresent(page -> {
                     throw new RuleViolationException(
-                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
+                            new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
                     );
                 });
 
         log.info("Verifying if obligatory fields are missing. ");
 
-        setDefaultValues(createPageRequest);
+        this.setDefaultValues(createPageRequest);
 
         log.info("Validating background type.");
 
-        validateBackgroundType(createPageRequest);
+        this.validateBackgroundType(createPageRequest);
 
         var page = Page
                 .builder()
@@ -87,7 +91,7 @@ public class PageServiceImpl implements PageService {
 
         log.info("Starting saving page {} in database.", page.getSlug());
 
-        var pageSaved = pageRepository.save(page);
+        var pageSaved = this.pageRepository.save(page);
 
 
         return PageResponse
@@ -108,11 +112,15 @@ public class PageServiceImpl implements PageService {
     @Override
     public PageResponse update(UpdatePageRequest updatePageRequest, Integer id) {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var account = accountService.findByEmail(userDetails.getUsername());
+        var account = this.accountService.findByEmail(userDetails.getUsername());
 
         var page = findById(id);
 
-        validateSlug(updatePageRequest, page);
+        this.validateAuthorizations(account, page);
+
+        this.validateSlug(updatePageRequest, page);
+
+        this.setEmptyFields(updatePageRequest, page);
 
         page.setSlug(updatePageRequest.getSlug());
         page.setTitle(updatePageRequest.getTitle());
@@ -123,6 +131,7 @@ public class PageServiceImpl implements PageService {
         page.setBackgroundValue(updatePageRequest.getBackgroundValue());
         page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
+        var pageUpdated = this.pageRepository.save(page);
 
         var pageUpdated = pageRepository.save(page);
 
@@ -140,14 +149,48 @@ public class PageServiceImpl implements PageService {
                 .build();
     }
 
+    private  void validateAuthorizations(Account account, Page page) {
+        if(!account.getId().equals(page.getAccount().getId())){
+            throw new ForbidenException(
+                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getSlug()))
+            );
+        }
+    }
+
+    private  void setEmptyFields(UpdatePageRequest updatePageRequest, Page page) {
+        if(ObjectUtils.isEmpty(updatePageRequest.getTitle())){
+            updatePageRequest.setTitle(page.getTitle());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getDescription())){
+            updatePageRequest.setDescription(page.getDescription());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getPhoto())){
+            updatePageRequest.setPhoto(page.getPhoto());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getFontColor())){
+            updatePageRequest.setFontColor(page.getFontColor());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getBackgroundType())){
+            updatePageRequest.setBackgroundType(page.getBackgroundType());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getBackgroundValue())){
+            updatePageRequest.setBackgroundValue(page.getBackgroundValue());
+        }
+    }
+
     private void validateSlug(UpdatePageRequest updatePageRequest, Page page) {
         if(ObjectUtils.isEmpty(updatePageRequest.getSlug())){
             updatePageRequest.setSlug(page.getSlug());
         }
 
-        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  && slugExists(updatePageRequest)){
+        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  && this.slugExists(updatePageRequest)){
             throw new RuleViolationException(
-                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
+                            new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
         }
     }
 
@@ -169,21 +212,21 @@ public class PageServiceImpl implements PageService {
         if(!createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
                 !createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE)) {
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
             );
         }
 
         if(createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
                 !createPageRequest.getBackgroundValue().matches(HEX_VALIDATION_REGEX)){
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
             );
         }
 
         if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
                 !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
             );
         }
     }
