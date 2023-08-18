@@ -14,6 +14,7 @@ import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -44,10 +45,12 @@ public class PageServiceImpl implements PageService {
 
     private final PageRepository pageRepository;
     private final AccountService accountService;
+    private final ModelMapper mapper;
 
-    public PageServiceImpl(PageRepository pageRepository, AccountService accountService) {
+    public PageServiceImpl(PageRepository pageRepository, AccountService accountService, ModelMapper mapper) {
         this.pageRepository = pageRepository;
         this.accountService = accountService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -75,38 +78,17 @@ public class PageServiceImpl implements PageService {
 
         this.validateBackgroundType(createPageRequest);
 
-        var page = Page
-                .builder()
-                .withAccount(account)
-                .withSlug(createPageRequest.getSlug())
-                .withTitle(createPageRequest.getTitle())
-                .withDescription(createPageRequest.getDescription())
-                .withPhoto(createPageRequest.getPhoto())
-                .withFontColor(createPageRequest.getFontColor())
-                .withBackgroundType(createPageRequest.getBackgroundType())
-                .withBackgroundValue(createPageRequest.getBackgroundValue())
-                .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .build();
+        var page = this.mapper.map(createPageRequest, Page.class);
+
+        page.setAccount(account);
+        page.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
         log.info("Starting saving page {} in database.", page.getSlug());
 
         var pageSaved = this.pageRepository.save(page);
 
-
-        return PageResponse
-                .builder()
-                .withId(pageSaved.getId())
-                .withSlug(pageSaved.getSlug())
-                .withTitle(pageSaved.getTitle())
-                .withDescription(pageSaved.getDescription())
-                .withPhoto(pageSaved.getPhoto())
-                .withFontColor(pageSaved.getFontColor())
-                .withBackgroundType(pageSaved.getBackgroundType())
-                .withBackgroundValue(pageSaved.getBackgroundValue())
-                .withCreatedAt(pageSaved.getCreatedAt())
-                .withUpdatedAt(pageSaved.getUpdatedAt())
-                .build();
+        return this.mapper.map(pageSaved, PageResponse.class);
     }
 
     @Override
@@ -133,20 +115,7 @@ public class PageServiceImpl implements PageService {
 
         var pageUpdated = this.pageRepository.save(page);
 
-        var pageUpdated = pageRepository.save(page);
-
-        return  PageResponse
-                .builder()
-                .withId(pageUpdated.getId())
-                .withSlug(pageUpdated.getSlug())
-                .withTitle(pageUpdated.getTitle())
-                .withDescription(pageUpdated.getDescription())
-                .withPhoto(pageUpdated.getPhoto())
-                .withFontColor(pageUpdated.getFontColor())
-                .withBackgroundType(pageUpdated.getBackgroundType())
-                .withBackgroundValue(pageUpdated.getBackgroundValue())
-                .withUpdatedAt(pageUpdated.getUpdatedAt())
-                .build();
+        return  this.mapper.map(pageUpdated, PageResponse.class);
     }
 
     private  void validateAuthorizations(Account account, Page page) {
