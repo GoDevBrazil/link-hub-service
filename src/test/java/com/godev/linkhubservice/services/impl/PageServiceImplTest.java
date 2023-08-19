@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +52,9 @@ class PageServiceImplTest {
     @Mock
     private AccountService accountService;
 
+    @Mock
+    private ModelMapper mapper;
+
     @InjectMocks
     private PageServiceImpl pageService;
 
@@ -72,7 +76,7 @@ class PageServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
-        this.mockedAccount = AccountMockBuilder.getBuilder().mock().build();
+        this.mockedAccount = AccountMockBuilder.getBuilder().mock().withId().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
     }
 
@@ -144,6 +148,7 @@ class PageServiceImplTest {
 
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
+        when(this.mapper.map(this.mockedCreatePageRequest, Page.class)).thenReturn(this.mockedPageSaved);
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
         //action
@@ -156,6 +161,7 @@ class PageServiceImplTest {
         verify(this.pageRepository, times(1)).save(any());
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.mapper, times(1)).map(this.mockedCreatePageRequest, Page.class);
     }
 
     @Test
