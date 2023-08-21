@@ -2,12 +2,12 @@ package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.Issue;
-import com.godev.linkhubservice.domain.exceptions.IssueEnum;
-import com.godev.linkhubservice.services.PageService;
-import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
+import com.godev.linkhubservice.helpers.UpdatePageRequestMockBuilder;
 import com.godev.linkhubservice.security.jwt.JwtService;
+import com.godev.linkhubservice.services.PageService;
+import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.*;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -90,7 +86,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, SLUG_REQUIRED_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, SLUG_REQUIRED_ERROR))));
     }
 
     @Test
@@ -105,7 +101,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(SLUG_REQUIRED_ERROR, SLUG_LENGTH_ERROR)))));
+                        new Issue(ARGUMENT_NOT_VALID, List.of(SLUG_REQUIRED_ERROR, SLUG_LENGTH_ERROR)))));
     }
 
     @Test
@@ -120,7 +116,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR))));
     }
 
     @Test
@@ -135,7 +131,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR))));
     }
 
     @Test
@@ -150,7 +146,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR))));
     }
 
     @Test
@@ -165,7 +161,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR))));
     }
 
     @Test
@@ -180,7 +176,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test
@@ -195,7 +191,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test
@@ -210,7 +206,7 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
     }
 
     @Test
@@ -225,6 +221,89 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))));
+                        new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))));
+    }
+
+    @Test
+    @DisplayName("Should update page when valid body is passed")
+    void updatePageHappyPath() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should update page when null slug is passed")
+    void updatePageNullSlug() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid length slug is passed")
+    void updatePageInvalidLengthSlug() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR))));
+    }
+
+    @Test
+    @DisplayName("Should update page when null title is passed")
+    void updatePageNullTitle() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullTitle().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid length title is passed")
+    void updatePageInvalidLengthTitle() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR))));
     }
 }
