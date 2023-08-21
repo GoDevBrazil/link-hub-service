@@ -7,7 +7,6 @@ import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
-import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageMockBuilder;
 import com.godev.linkhubservice.services.AccountService;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -48,16 +46,9 @@ class PageServiceImplTest {
 
     @Mock
     private PageRepository pageRepository;
-
     @Mock
     private AccountService accountService;
-
-    @Mock
-    private ModelMapper mapper;
-
-    @InjectMocks
     private PageServiceImpl pageService;
-
     CreatePageRequest mockedCreatePageRequest;
     Account mockedAccount;
     Page mockedPageSaved;
@@ -69,6 +60,8 @@ class PageServiceImplTest {
 
     @BeforeEach
     void setup(){
+        this.pageService = new PageServiceImpl(pageRepository, accountService, new ModelMapper());
+
         Authentication authentication = Mockito.mock(Authentication.class);
         Mockito.when(authentication.getPrincipal()).thenReturn(this.userDetails);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -78,6 +71,7 @@ class PageServiceImplTest {
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
         this.mockedAccount = AccountMockBuilder.getBuilder().mock().withId().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
+
     }
 
     @Test
@@ -148,7 +142,6 @@ class PageServiceImplTest {
 
         when(this.accountService.findByEmail(this.userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findBySlug(this.mockedCreatePageRequest.getSlug())).thenReturn(Optional.empty());
-        when(this.mapper.map(this.mockedCreatePageRequest, Page.class)).thenReturn(this.mockedPageSaved);
         when(this.pageRepository.save(any())).thenReturn(this.mockedPageSaved);
 
         //action
@@ -161,7 +154,6 @@ class PageServiceImplTest {
         verify(this.pageRepository, times(1)).save(any());
         verify(this.pageRepository, times(1)).findBySlug(this.mockedCreatePageRequest.getSlug());
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
-        verify(this.mapper, times(1)).map(this.mockedCreatePageRequest, Page.class);
     }
 
     @Test

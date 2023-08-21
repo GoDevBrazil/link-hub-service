@@ -104,13 +104,8 @@ public class PageServiceImpl implements PageService {
 
         this.setEmptyFields(updatePageRequest, page);
 
-        page.setSlug(updatePageRequest.getSlug());
-        page.setTitle(updatePageRequest.getTitle());
-        page.setDescription(updatePageRequest.getDescription());
-        page.setPhoto(updatePageRequest.getPhoto());
-        page.setFontColor(updatePageRequest.getFontColor());
-        page.setBackgroundType(updatePageRequest.getBackgroundType());
-        page.setBackgroundValue(updatePageRequest.getBackgroundValue());
+        this.mapper.map(updatePageRequest, page);
+
         page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
         var pageUpdated = this.pageRepository.save(page);
