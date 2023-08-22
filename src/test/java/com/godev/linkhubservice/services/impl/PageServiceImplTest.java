@@ -1,14 +1,17 @@
 package com.godev.linkhubservice.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.ForbidenException;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
+import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageMockBuilder;
+import com.godev.linkhubservice.helpers.UpdatePageRequestMockBuilder;
 import com.godev.linkhubservice.services.AccountService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,9 +36,11 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,15 +53,22 @@ class PageServiceImplTest {
     private PageRepository pageRepository;
     @Mock
     private AccountService accountService;
+
     private PageServiceImpl pageService;
+
     CreatePageRequest mockedCreatePageRequest;
+
     Account mockedAccount;
+
     Page mockedPageSaved;
+
     UserDetails userDetails = User.builder()
             .username("kibe@email.com")
-            .password("321")
+            .password("Kibe@1234")
             .roles("USER")
             .build();
+
+    UpdatePageRequest mockedUpdatePageRequest;
 
     @BeforeEach
     void setup(){
@@ -282,5 +294,46 @@ class PageServiceImplTest {
         Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR),
                 ruleViolationException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with valid fields")
+    void pageUpdateHappyPatch(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should throw Forbiden Exception when an user is not allowed editing page")
+    void pageUpdateNotAllowed(){
+        //arrange
+        this.mockedAccount = AccountMockBuilder.getBuilder().mock().withAnotherId().build();
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+
+        //action
+        ForbidenException forbidenException = Assertions.assertThrows(ForbidenException.class,
+                () -> this.pageService.update(this.mockedUpdatePageRequest, 1));
+
+        //assertions
+        Assertions.assertEquals(FORBIDEN.getMessage(), forbidenException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getSlug())),
+                forbidenException.getIssue().getDetails());
     }
 }

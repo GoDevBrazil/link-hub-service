@@ -41,6 +41,13 @@ public class AccountMockBuilder {
         return this;
     }
 
+    public AccountMockBuilder withAnotherId() {
+
+        this.account.setId(2);
+
+        return this;
+    }
+
     public Account build() {
         return account;
     }

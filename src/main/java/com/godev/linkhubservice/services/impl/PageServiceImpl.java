@@ -96,7 +96,7 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = this.accountService.findByEmail(userDetails.getUsername());
 
-        var page = findById(id);
+        var page = this.findById(id);
 
         this.validateAuthorizations(account, page);
 
