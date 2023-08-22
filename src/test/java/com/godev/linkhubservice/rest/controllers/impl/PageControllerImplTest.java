@@ -21,7 +21,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.*;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -306,4 +312,154 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR))));
     }
+
+    @Test
+    @DisplayName("Should update page when null description is passed")
+    void updatePageNullDescription() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullDescription().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid length description is passed")
+    void updatePageInvalidLengthDescription() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR))));
+    }
+
+    @Test
+    @DisplayName("Should update page when null photo is passed")
+    void updatePageNullPhoto() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid format photo is passed")
+    void updatePageInvalidFormatPhoto() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR))));
+    }
+
+    @Test
+    @DisplayName("Should update page when null font color is passed")
+    void updatePageNullFontColor() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid format font color is passed")
+    void updatePageInvalidFormatFontColor() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
+    }
+
+    @Test
+    @DisplayName("Should update page when null background type is passed")
+    void updatePageNullBackgroundType() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should update page when null background value is passed")
+    void updatePageNullBackgroundValue() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build();
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when invalid format background value is passed")
+    void updatePageInvalidFormatBackgroundValue() throws Exception {
+
+        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build();
+        final var bearerToken = "Bearer kibe";
+
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(
+                        new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))));
+    }
+
 }
