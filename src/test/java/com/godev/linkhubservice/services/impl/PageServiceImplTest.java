@@ -1,7 +1,7 @@
 package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.exceptions.ForbidenException;
-import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
@@ -35,12 +35,15 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -81,6 +84,8 @@ class PageServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         this.mockedCreatePageRequest = CreatePageRequestMockBuilder.getBuilder().mock().build();
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
+
         this.mockedAccount = AccountMockBuilder.getBuilder().mock().withId().build();
         this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().build();
 
@@ -139,7 +144,7 @@ class PageServiceImplTest {
                 () -> this.pageService.create(this.mockedCreatePageRequest));
 
         //assert
-        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(SLUG_EXISTS_ERROR, this.mockedCreatePageRequest.getSlug())),
                 ruleViolationException.getIssue().getDetails());
     }
@@ -253,7 +258,7 @@ class PageServiceImplTest {
                 () -> this.pageService.create(this.mockedCreatePageRequest));
 
         //assert
-        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(INVALID_BACKGROUND_TYPE_ERROR),
                 ruleViolationException.getIssue().getDetails());
     }
@@ -272,7 +277,7 @@ class PageServiceImplTest {
                 () -> this.pageService.create(this.mockedCreatePageRequest));
 
         //assert
-        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR),
                 ruleViolationException.getIssue().getDetails());
     }
@@ -291,7 +296,7 @@ class PageServiceImplTest {
                 () -> this.pageService.create(this.mockedCreatePageRequest));
 
         //assert
-        Assertions.assertEquals(IssueEnum.ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
         Assertions.assertEquals(List.of(INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR),
                 ruleViolationException.getIssue().getDetails());
     }
@@ -322,7 +327,6 @@ class PageServiceImplTest {
     void pageUpdateNotAllowed(){
         //arrange
         this.mockedAccount = AccountMockBuilder.getBuilder().mock().withAnotherId().build();
-        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
 
         when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
         when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
@@ -335,5 +339,187 @@ class PageServiceImplTest {
         Assertions.assertEquals(FORBIDEN.getMessage(), forbidenException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getSlug())),
                 forbidenException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null title")
+    void pageUpdateNullTitle(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullTitle().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null description")
+    void pageUpdateNullDescription(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullDescription().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null photo")
+    void pageUpdateNullPhoto(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null font color")
+    void pageUpdateNullFontColor(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null background type")
+    void pageUpdateNullBackgroundType(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null background value")
+    void pageUpdateNullBackgroundValue(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should return Page Response when update success with null slug")
+    void pageUpdateNullSlug(){
+        //arrange
+        this.mockedUpdatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.save(this.mockedPageSaved)).thenReturn(this.mockedPageSaved);
+
+        //action
+        final var pageResponse = this.pageService.update(this.mockedUpdatePageRequest, 1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        Assertions.assertEquals(this.mockedPageSaved.getId(), pageResponse.getId());
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).save(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should throw Rule Violation Exception when slug already exists")
+    void pageUpdateSlugAlreadyExists(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        when(this.pageRepository.findBySlug(this.mockedUpdatePageRequest.getSlug())).thenReturn(Optional.of(this.mockedPageSaved));
+
+        //action
+        RuleViolationException ruleViolationException = Assertions.assertThrows(RuleViolationException.class,
+                () -> this.pageService.update(this.mockedUpdatePageRequest, 1));
+
+        //assertions
+        Assertions.assertEquals(ARGUMENT_NOT_VALID.getMessage(), ruleViolationException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(SLUG_EXISTS_ERROR, this.mockedUpdatePageRequest.getSlug())),
+                ruleViolationException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should throw Object Not Found Exception when page is not found")
+    void pageUpdateNotFoundPage(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.empty());
+
+        //action
+        ObjectNotFoundException objectNotFoundException = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> this.pageService.update(this.mockedUpdatePageRequest, 1));
+
+        //assertions
+        Assertions.assertEquals(OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(ID_NOT_FOUND_ERROR, 1)),
+                objectNotFoundException.getIssue().getDetails());
     }
 }

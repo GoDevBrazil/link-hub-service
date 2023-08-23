@@ -168,7 +168,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private boolean slugExists(UpdatePageRequest updatePageRequest){
-        var slug = pageRepository.findBySlug(updatePageRequest.getSlug()).orElse(null);
+        var slug = this.pageRepository.findBySlug(updatePageRequest.getSlug()).orElse(null);
         return ObjectUtils.isNotEmpty(slug);
     }
 
