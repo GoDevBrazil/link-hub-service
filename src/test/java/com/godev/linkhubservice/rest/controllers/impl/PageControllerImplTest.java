@@ -2,6 +2,7 @@ package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
 import com.godev.linkhubservice.helpers.UpdatePageRequestMockBuilder;
@@ -11,6 +12,9 @@ import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,6 +24,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
@@ -397,22 +402,6 @@ class PageControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request when invalid format font color is passed")
-    void updatePageInvalidFormatFontColor() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build();
-        final var bearerToken = "Bearer kibe";
-
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))));
-    }
-
-    @Test
     @DisplayName("Should update page when null background type is passed")
     void updatePageNullBackgroundType() throws Exception {
 
@@ -446,11 +435,10 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
     }
 
-    @Test
-    @DisplayName("Should throw bad request when invalid format background value is passed")
-    void updatePageInvalidFormatBackgroundValue() throws Exception {
+    @ParameterizedTest
+    @MethodSource("updatePageRequestAndIssues")
+    void updatePageParametrized(UpdatePageRequest updatePageRequest, Issue issue) throws Exception {
 
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build();
         final var bearerToken = "Bearer kibe";
 
 
@@ -458,8 +446,15 @@ class PageControllerImplTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))));
+                .andExpect(content().json(objectMapper.writeValueAsString(issue)));
+    }
+
+    private static Stream<Arguments> updatePageRequestAndIssues() {
+        return Stream.of(
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))
+
+        );
     }
 
 }
