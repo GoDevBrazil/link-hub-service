@@ -38,7 +38,11 @@ public class PageControllerImpl implements PageController {
     @Override
     public ResponseEntity<PageResponse> update(UpdatePageRequest updatePageRequest, Integer id) {
 
+        log.info("Starting update page");
+
         var pageResponse = pageService.update(updatePageRequest, id);
+
+        log.info("Page {} updated and saved in database", pageResponse.getSlug());
 
         return ResponseEntity.ok(pageResponse);
     }

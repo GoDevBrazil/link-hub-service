@@ -108,12 +108,16 @@ public class PageServiceImpl implements PageService {
 
         page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
+        log.info("Updating page {}", page.getSlug());
+
         var pageUpdated = this.pageRepository.save(page);
 
         return  this.mapper.map(pageUpdated, PageResponse.class);
     }
 
     private  void validateAuthorizations(Account account, Page page) {
+        log.info("Verifying user authorization to edit page {}", page.getSlug());
+
         if(!account.getId().equals(page.getAccount().getId())){
             throw new ForbidenException(
                     new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getSlug()))
@@ -122,6 +126,8 @@ public class PageServiceImpl implements PageService {
     }
 
     private  void setEmptyFields(UpdatePageRequest updatePageRequest, Page page) {
+        log.info("Verifying and setting empty fields");
+
         if(ObjectUtils.isEmpty(updatePageRequest.getTitle())){
             updatePageRequest.setTitle(page.getTitle());
         }
@@ -148,6 +154,8 @@ public class PageServiceImpl implements PageService {
     }
 
     private void validateSlug(UpdatePageRequest updatePageRequest, Page page) {
+        log.info("Validating slug {}", updatePageRequest.getSlug());
+
         if(ObjectUtils.isEmpty(updatePageRequest.getSlug())){
             updatePageRequest.setSlug(page.getSlug());
         }
@@ -160,6 +168,8 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public Page findById(Integer id) {
+
+        log.info("Searching this page in database");
 
         return this.pageRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(
