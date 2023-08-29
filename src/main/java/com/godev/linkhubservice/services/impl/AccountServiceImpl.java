@@ -15,6 +15,7 @@ import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,11 +38,12 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper mapper;
 
-    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, ModelMapper mapper) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
-
+        this.mapper = mapper;
     }
 
     @Override
@@ -55,26 +57,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             );
         }
 
-        var account = Account
-                .builder()
-                .withName(accountRequest.getName())
-                .withEmail(accountRequest.getEmail())
-                .withPassword(passwordEncoder.encode(accountRequest.getPassword()))
-                .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .build();
+        var account = this.mapper.map(accountRequest, Account.class);
+
+        account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+        account.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
         log.info("Starting saving account {} in database", account.getName());
 
         var accountSaved = accountRepository.save(account);
 
-        return AccountResponse
-                .builder()
-                .withId(accountSaved.getId())
-                .withName(accountSaved.getName())
-                .withEmail(accountSaved.getEmail())
-                .withCreatedAt(accountSaved.getCreatedAt())
-                .build();
+        return this.mapper.map(accountSaved, AccountResponse.class);
     }
 
     @Override
@@ -109,6 +102,33 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         log.info("Validating request fields");
 
+        validateUpdateEmail(updateAccountRequest, account);
+
+        setEmptyFields(updateAccountRequest, account);
+
+        this.mapper.map(updateAccountRequest, account);
+
+        account.setPassword(passwordEncoder.encode(updateAccountRequest.getPassword()));
+        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+        log.info("Saving changes in database");
+
+        var accountUpdated = accountRepository.save(account);
+
+        return this.mapper.map(accountUpdated, UpdateAccountResponse.class);
+    }
+
+    private void setEmptyFields(UpdateAccountRequest updateAccountRequest, Account account) {
+        if(ObjectUtils.isEmpty(updateAccountRequest.getName())){
+            updateAccountRequest.setName(account.getName());
+        }
+
+        if(ObjectUtils.isEmpty(updateAccountRequest.getPassword())){
+            updateAccountRequest.setPassword(account.getPassword());
+        }
+    }
+
+    private void validateUpdateEmail(UpdateAccountRequest updateAccountRequest, Account account) {
         if(ObjectUtils.isEmpty(updateAccountRequest.getEmail())){
             updateAccountRequest.setEmail(account.getEmail());
         }
@@ -118,31 +138,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                     new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(EMAIL_EXISTS_ERROR, updateAccountRequest.getEmail()))
             );
         }
-
-        if(ObjectUtils.isEmpty(updateAccountRequest.getName())){
-            updateAccountRequest.setName(account.getName());
-        }
-
-        if(ObjectUtils.isEmpty(updateAccountRequest.getPassword())){
-            updateAccountRequest.setPassword(account.getPassword());
-        }
-
-        account.setName(updateAccountRequest.getName());
-        account.setEmail(updateAccountRequest.getEmail());
-        account.setPassword(passwordEncoder.encode(updateAccountRequest.getPassword()));
-        account.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-
-        log.info("Saving changes in database");
-
-        var accountUpdated = accountRepository.save(account);
-
-        return UpdateAccountResponse
-                .builder()
-                .withId(accountUpdated.getId())
-                .withName(accountUpdated.getName())
-                .withEmail(accountUpdated.getEmail())
-                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .build();
     }
 
     private boolean accountExists(String email) {

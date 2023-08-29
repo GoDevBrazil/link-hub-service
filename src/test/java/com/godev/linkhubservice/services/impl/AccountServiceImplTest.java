@@ -16,10 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +46,7 @@ class AccountServiceImplTest {
     private AccountRepository accountRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
-    @InjectMocks
+
     private AccountServiceImpl accountService;
 
 
@@ -64,6 +64,7 @@ class AccountServiceImplTest {
 
     @BeforeEach
     void setup(){
+        this.accountService = new AccountServiceImpl(this.accountRepository, this.passwordEncoder, new ModelMapper());
 
         Authentication authentication = Mockito.mock(Authentication.class);
         Mockito.lenient().when(authentication.getPrincipal()).thenReturn(this.userDetails);
