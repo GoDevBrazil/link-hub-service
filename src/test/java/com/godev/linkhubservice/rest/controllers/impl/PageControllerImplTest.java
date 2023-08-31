@@ -270,22 +270,6 @@ class PageControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request when invalid length slug is passed")
-    void updatePageInvalidLengthSlug() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build();
-        final var bearerToken = "Bearer kibe";
-
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR))));
-    }
-
-    @Test
     @DisplayName("Should update page when null title is passed")
     void updatePageNullTitle() throws Exception {
 
@@ -300,22 +284,6 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when invalid length title is passed")
-    void updatePageInvalidLengthTitle() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build();
-        final var bearerToken = "Bearer kibe";
-
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR))));
     }
 
     @Test
@@ -336,22 +304,6 @@ class PageControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should throw bad request when invalid length description is passed")
-    void updatePageInvalidLengthDescription() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build();
-        final var bearerToken = "Bearer kibe";
-
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR))));
-    }
-
-    @Test
     @DisplayName("Should update page when null photo is passed")
     void updatePageNullPhoto() throws Exception {
 
@@ -366,22 +318,6 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when invalid format photo is passed")
-    void updatePageInvalidFormatPhoto() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build();
-        final var bearerToken = "Bearer kibe";
-
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR))));
     }
 
     @Test
@@ -436,11 +372,10 @@ class PageControllerImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("updatePageRequestAndIssues")
-    void updatePageParametrized(UpdatePageRequest updatePageRequest, Issue issue) throws Exception {
+    @MethodSource("updateInvalidPageRequestsAndIssues")
+    void updatePageInvalidFormats(UpdatePageRequest updatePageRequest, Issue issue) throws Exception {
 
         final var bearerToken = "Bearer kibe";
-
 
         mockMvc.perform(put("/page/1")
                         .contentType("application/json")
@@ -449,10 +384,14 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(issue)));
     }
 
-    private static Stream<Arguments> updatePageRequestAndIssues() {
+    private static Stream<Arguments> updateInvalidPageRequestsAndIssues() {
         return Stream.of(
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR))
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
 
         );
     }
