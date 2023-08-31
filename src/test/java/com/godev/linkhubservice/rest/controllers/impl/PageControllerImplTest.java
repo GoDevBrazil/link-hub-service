@@ -2,6 +2,7 @@ package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
 import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
@@ -236,40 +237,6 @@ class PageControllerImplTest {
     }
 
     @Test
-    @DisplayName("Should update page when valid body is passed")
-    void updatePageHappyPath() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().build();
-        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
-        final var bearerToken = "Bearer kibe";
-
-        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
-    }
-
-    @Test
-    @DisplayName("Should update page when null slug is passed")
-    void updatePageNullSlug() throws Exception {
-
-        final var updatePageRequest = UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build();
-        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
-        final var bearerToken = "Bearer kibe";
-
-        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
-
-        mockMvc.perform(put("/page/1")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
-    }
-
-    @Test
     @DisplayName("Should update page when null title is passed")
     void updatePageNullTitle() throws Exception {
 
@@ -393,6 +360,28 @@ class PageControllerImplTest {
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
 
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("updatePageRequestsNullFields")
+    void updatePageNullFields(UpdatePageRequest updatePageRequest, PageResponse pageResponse) throws Exception {
+
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.update(updatePageRequest, 1)).thenReturn(pageResponse);
+
+        mockMvc.perform(put("/page/1")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    private static Stream<Arguments> updatePageRequestsNullFields() {
+        return Stream.of(
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().build(), PageResponseMockBuilder.getBuilder().mock().build()),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), PageResponseMockBuilder.getBuilder().mock().build())
         );
     }
 
