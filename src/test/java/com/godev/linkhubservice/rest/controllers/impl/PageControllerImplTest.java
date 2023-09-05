@@ -17,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,10 +88,9 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
     }
 
-    @ParameterizedTest(name = "Should throw exception when invalid {0} is passed")
-    @EnumSource(value = PageFields.class, names = {"SLUG", "TITLE", "DESCRIPTION", "PHOTO", "FONTCOLOR", "BACKGROUNDVALUE"})
+    @ParameterizedTest(name = "Should throw exception when invalid {2} is passed")
     @MethodSource("pageRequestsInvalidFormats")
-    void createPageInvalidFormats(CreatePageRequest createPageRequest, Issue issue) throws Exception {
+    void createPageInvalidFormats(CreatePageRequest createPageRequest, Issue issue, PageFields pageFields) throws Exception {
 
         final var bearerToken = "Bearer kibe";
 
@@ -101,22 +99,6 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(createPageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(issue)));
-    }
-
-    private static Stream<Arguments> pageRequestsInvalidFormats(){
-        return Stream.of(
-//                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_REQUIRED_ERROR)),
-//                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withEmptySlug().build(), new Issue(ARGUMENT_NOT_VALID, List.of(SLUG_REQUIRED_ERROR, SLUG_LENGTH_ERROR))),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR)),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTittle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR)),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR)),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidUrlFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR)),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
-//                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
-//                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidNameFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
-        );
-
     }
 
     @Test
@@ -150,18 +132,6 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(issue)));
     }
 
-    private static Stream<Arguments> updateInvalidPageRequestsAndIssues() {
-        return Stream.of(
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
-
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("updateNullFieldsPageRequests")
     void updatePageNullFields(UpdatePageRequest updatePageRequest, PageResponse pageResponse) throws Exception {
@@ -177,6 +147,32 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
     }
 
+    private static Stream<Arguments> pageRequestsInvalidFormats(){
+        return Stream.of(
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_REQUIRED_ERROR), PageFields.SLUG),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withEmptySlug().build(), new Issue(ARGUMENT_NOT_VALID, List.of(SLUG_REQUIRED_ERROR, SLUG_LENGTH_ERROR)), PageFields.SLUG),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR), PageFields.SLUG),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTittle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR), PageFields.TITLE),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR), PageFields.DESCRIPTION),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidUrlFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR), PageFields.PHOTO),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidNameFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR), PageFields.BACKGROUNDVALUE)
+        );
+
+    }
+    private static Stream<Arguments> updateInvalidPageRequestsAndIssues() {
+        return Stream.of(
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
+
+        );
+    }
     private static Stream<Arguments> updateNullFieldsPageRequests() {
         return Stream.of(
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), PageResponseMockBuilder.getBuilder().mock().build()),
