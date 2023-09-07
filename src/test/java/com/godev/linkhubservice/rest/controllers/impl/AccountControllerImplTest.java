@@ -1,6 +1,7 @@
 package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.godev.linkhubservice.domain.enums.AccountFields;
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
@@ -88,74 +89,15 @@ class AccountControllerImplTest {
 
     }
 
-    @Test
-    @DisplayName("Should throw bad request when account request email field is invalid")
-    void registerInvalidEmailField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
+    @ParameterizedTest(name = "Should throw BadRequestException when invalid {2} is passed")
+    @MethodSource("accountRequestsInvalidOrNullFields")
+    void registerNullOrInvalidFields(AccountRequest accountRequest, Issue issue, AccountFields accountField) throws Exception{
 
         mockMvc.perform(post("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request email field has invalid length")
-    void registerInvalidLengthEmailField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request password field is null")
-    void registerNullPasswordField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request password field is invalid")
-    void registerInvalidPasswordField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request password field has invalid length")
-    void registerInvalidLengthPasswordField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
-
+                .andExpect(content().json(objectMapper.writeValueAsString(issue)));
     }
 
     @Test
@@ -464,23 +406,17 @@ class AccountControllerImplTest {
 
     }
 
-    @ParameterizedTest
-    @MethodSource("accountRequestsInvalidOrNullFields")
-    void registerNullOrInvalidFields(AccountRequest accountRequest, Issue issue) throws Exception{
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(issue)));
-    }
-
     private static Stream<Arguments> accountRequestsInvalidOrNullFields() {
         return Stream.of(
-                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR)),
-                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR)),
-                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR))),
-                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR), AccountFields.NAME),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR), AccountFields.NAME),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR)), AccountFields.NAME),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR), AccountFields.EMAIL),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR), AccountFields.EMAIL),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR), AccountFields.EMAIL),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR), AccountFields.PASSWORD),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD)
         );
     }
 }
