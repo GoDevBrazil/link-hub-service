@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
@@ -15,6 +16,9 @@ import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.DateTimeException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.GENERATE_AUTH_TOKEN_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.INVALID_CREDENTIALS_ERROR;
@@ -80,63 +85,6 @@ class AccountControllerImplTest {
                         .content(objectMapper.writeValueAsString(accountRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request name field is null")
-    void registerNullNameField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullName().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request name field has invalid length")
-    void registerInvalidLengthNameField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request name field is empty")
-    void registerEmptyNameField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR)))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when account request email field is null")
-    void registerNullEmailField() throws Exception {
-
-        final var accountRequest = AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
-
-        mockMvc.perform(post("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(accountRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))));
 
     }
 
@@ -514,5 +462,25 @@ class AccountControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(
                         new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("accountRequestsInvalidOrNullFields")
+    void registerNullOrInvalidFields(AccountRequest accountRequest, Issue issue) throws Exception{
+
+        mockMvc.perform(post("/account")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(accountRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(issue)));
+    }
+
+    private static Stream<Arguments> accountRequestsInvalidOrNullFields() {
+        return Stream.of(
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_REQUIRED_ERROR)),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR)),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withEmptyName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, List.of(NAME_REQUIRED_ERROR, NAME_LENGTH_ERROR))),
+                Arguments.of(AccountRequestMockBuilder.getBuilder().mock().withNullEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_REQUIRED_ERROR))
+        );
     }
 }
