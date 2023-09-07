@@ -119,9 +119,9 @@ class PageControllerImplTest {
 
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Should throw exception when invalid {2} is passed")
     @MethodSource("updateInvalidPageRequestsAndIssues")
-    void updatePageInvalidFormats(UpdatePageRequest updatePageRequest, Issue issue) throws Exception {
+    void updatePageInvalidFormats(UpdatePageRequest updatePageRequest, Issue issue, PageFields pageFields) throws Exception {
 
         final var bearerToken = "Bearer kibe";
 
@@ -132,9 +132,9 @@ class PageControllerImplTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(issue)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Should update page with previous data when {2} is null ")
     @MethodSource("updateNullFieldsPageRequests")
-    void updatePageNullFields(UpdatePageRequest updatePageRequest, PageResponse pageResponse) throws Exception {
+    void updatePageNullFields(UpdatePageRequest updatePageRequest, PageResponse pageResponse, PageFields pageFields) throws Exception {
 
         final var bearerToken = "Bearer kibe";
 
@@ -164,24 +164,24 @@ class PageControllerImplTest {
     }
     private static Stream<Arguments> updateInvalidPageRequestsAndIssues() {
         return Stream.of(
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR)),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR))
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR), PageFields.SLUG),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR), PageFields.TITLE),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR), PageFields.DESCRIPTION),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR), PageFields.PHOTO),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR), PageFields.BACKGROUNDVALUE)
 
         );
     }
     private static Stream<Arguments> updateNullFieldsPageRequests() {
         return Stream.of(
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullTitle().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullDescription().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build(), PageResponseMockBuilder.getBuilder().mock().build()),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build(), PageResponseMockBuilder.getBuilder().mock().build())
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullSlug().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.SLUG),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullTitle().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.TITLE),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullDescription().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.DESCRIPTION),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullPhoto().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.PHOTO),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullFontColor().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.FONTCOLOR),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundType().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.BACKGROUNDTYPE),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withNullBackgroundValue().build(), PageResponseMockBuilder.getBuilder().mock().build(), PageFields.BACKGROUNDVALUE)
         );
     }
 

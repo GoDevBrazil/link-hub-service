@@ -6,5 +6,6 @@ public enum PageFields {
     DESCRIPTION,
     PHOTO,
     FONTCOLOR,
+    BACKGROUNDTYPE,
     BACKGROUNDVALUE
 }
