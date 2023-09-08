@@ -7,6 +7,7 @@ import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
 import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
+import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
 import com.godev.linkhubservice.helpers.AccountRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
@@ -182,11 +183,10 @@ class AccountControllerImplTest {
 
     }
 
-    @Test
-    @DisplayName("Should update account with same name when update account request name field is null")
-    void accountUpdateNullNameField() throws Exception {
+    @ParameterizedTest(name = "Should update account with same {1} when update account request {1} field is null")
+    @MethodSource("updateAccountRequestNullFields")
+    void accountUpdateNullFields(UpdateAccountRequest updateAccountRequest, AccountFields accountField) throws Exception {
 
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullName().build();
         final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
@@ -197,139 +197,19 @@ class AccountControllerImplTest {
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
-
     }
 
-    @Test
-    @DisplayName("Should throw bad request when update account request name field has invalid length")
-    void accountUpdateInvalidLengthNameField() throws Exception {
+    @ParameterizedTest(name = "Should throw bad request when update account request {2} field has invalid length or format")
+    @MethodSource("updateAccountRequestInvalidFormatOrLength")
+    void updateAccountInvalidFormatOrLength(UpdateAccountRequest updateAccountRequest, Issue issue, AccountFields accountField) throws Exception {
 
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build();
         final var bearerToken = "Bearer kibe";
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when update account request name field is empty")
-    void accountUpdateEmptyNameField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withEmptyName().build();
-        final var bearerToken = "Bearer kibe";
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should update account with same email when update account request email field is null")
-    void accountUpdateNullEmailField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
-        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
-        final var bearerToken = "Bearer kibe";
-
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when update account request email field is invalid")
-    void accountUpdateInvalidEmailField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build();
-        final var bearerToken = "Bearer kibe";
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when update account request email field has invalid length")
-    void accountUpdateInvalidLengthEmailField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build();
-        final var bearerToken = "Bearer kibe";
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should update account with same password when update account request password field is null")
-    void accountUpdateNullPasswordField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
-        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
-        final var bearerToken = "Bearer kibe";
-
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when update account request password field is invalid")
-    void accountUpdateInvalidPasswordField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build();
-        final var bearerToken = "Bearer kibe";
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
-
-    }
-
-    @Test
-    @DisplayName("Should throw bad request when update account request password field has invalid length")
-    void accountUpdateInvalidLengthPasswordField() throws Exception {
-
-        final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build();
-        final var bearerToken = "Bearer kibe";
-
-        mockMvc.perform(put("/account")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(objectMapper.writeValueAsString(
-                        new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR))));
-
+                .andExpect(content().json(objectMapper.writeValueAsString(issue)));
     }
 
     private static Stream<Arguments> accountRequestsInvalidOrNullFields() {
@@ -354,6 +234,25 @@ class AccountControllerImplTest {
                 Arguments.of(AuthRequestMockBuilder.getBuilder().mock().withNullPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_REQUIRED_ERROR), AccountFields.PASSWORD),
                 Arguments.of(AuthRequestMockBuilder.getBuilder().mock().withInvalidPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD),
                 Arguments.of(AuthRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD)
+        );
+    }
+
+    private static Stream<Arguments> updateAccountRequestNullFields() {
+        return Stream.of(
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withNullName().build(), AccountFields.NAME),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withNullEmail().build(), AccountFields.EMAIL),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withNullPassword().build(), AccountFields.PASSWORD)
+        );
+    }
+
+    private static Stream<Arguments> updateAccountRequestInvalidFormatOrLength() {
+        return Stream.of(
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR), AccountFields.NAME),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withEmptyName().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, NAME_LENGTH_ERROR), AccountFields.NAME),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_FORMAT_ERROR), AccountFields.EMAIL),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthEmail().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, EMAIL_LENGTH_ERROR), AccountFields.EMAIL),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD),
+                Arguments.of(UpdateAccountRequestMockBuilder.getBuilder().mock().withInvalidLengthPassword().build(), new Issue(IssueEnum.ARGUMENT_NOT_VALID, PASSWORD_FORMAT_ERROR), AccountFields.PASSWORD)
         );
     }
 }
