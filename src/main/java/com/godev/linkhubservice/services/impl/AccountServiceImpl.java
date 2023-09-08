@@ -11,7 +11,6 @@ import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
-import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import com.godev.linkhubservice.services.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -96,7 +95,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public UpdateAccountResponse update(UpdateAccountRequest updateAccountRequest) {
+    public AccountResponse update(UpdateAccountRequest updateAccountRequest) {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = findByEmail(userDetails.getUsername());
 
@@ -115,7 +114,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         var accountUpdated = accountRepository.save(account);
 
-        return this.mapper.map(accountUpdated, UpdateAccountResponse.class);
+        return this.mapper.map(accountUpdated, AccountResponse.class);
     }
 
     private void setEmptyFields(UpdateAccountRequest updateAccountRequest, Account account) {

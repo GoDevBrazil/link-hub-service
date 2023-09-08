@@ -5,7 +5,6 @@ import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.AuthResponse;
 import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
-import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -40,5 +39,5 @@ public interface AccountController {
     ResponseEntity<AuthResponse> auth(@Valid @RequestBody AuthRequest authRequest);
 
     @PutMapping
-    ResponseEntity<UpdateAccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
+    ResponseEntity<AccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
 }

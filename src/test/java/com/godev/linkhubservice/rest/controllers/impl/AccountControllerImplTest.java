@@ -12,7 +12,6 @@ import com.godev.linkhubservice.helpers.AccountResponseMockBuilder;
 import com.godev.linkhubservice.helpers.AuthRequestMockBuilder;
 import com.godev.linkhubservice.helpers.AuthResponseMockBuilder;
 import com.godev.linkhubservice.helpers.UpdateAccountRequestMockBuilder;
-import com.godev.linkhubservice.helpers.UpdateAccountResponseMockBuilder;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -170,16 +169,16 @@ class AccountControllerImplTest {
     void accountUpdateHappyPath() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().build();
-        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
+        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
     }
 
@@ -188,16 +187,16 @@ class AccountControllerImplTest {
     void accountUpdateNullNameField() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullName().build();
-        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
+        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
     }
 
@@ -238,16 +237,16 @@ class AccountControllerImplTest {
     void accountUpdateNullEmailField() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullEmail().build();
-        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
+        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
     }
 
@@ -288,16 +287,16 @@ class AccountControllerImplTest {
     void accountUpdateNullPasswordField() throws Exception {
 
         final var updateAccountRequest = UpdateAccountRequestMockBuilder.getBuilder().mock().withNullPassword().build();
-        final var updateAccountResponse = UpdateAccountResponseMockBuilder.getBuilder().mock().build();
+        final var accountResponse = AccountResponseMockBuilder.getBuilder().mock().build();
         final var bearerToken = "Bearer kibe";
 
-        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(updateAccountResponse);
+        Mockito.when(this.accountService.update(updateAccountRequest)).thenReturn(accountResponse);
 
         mockMvc.perform(put("/account")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateAccountRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updateAccountResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(accountResponse)));
 
     }
 
