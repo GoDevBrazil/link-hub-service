@@ -5,7 +5,6 @@ import com.godev.linkhubservice.domain.vo.AccountRequest;
 import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
-import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AccountService {
@@ -16,5 +15,5 @@ public interface AccountService {
 
     Account findByEmail(String email);
 
-    UpdateAccountResponse update(UpdateAccountRequest updateAccountRequest);
+    AccountResponse update(UpdateAccountRequest updateAccountRequest);
 }

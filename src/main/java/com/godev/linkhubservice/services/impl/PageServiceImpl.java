@@ -1,16 +1,20 @@
 package com.godev.linkhubservice.services.impl;
 
+import com.godev.linkhubservice.domain.exceptions.ForbidenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
-import com.godev.linkhubservice.domain.exceptions.IssueEnum;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
+import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -23,12 +27,17 @@ import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_FONT_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_PHOTO;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.PAGE_BACKGROUND_TYPE_IMAGE;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
+import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
 @Slf4j
@@ -36,10 +45,12 @@ public class PageServiceImpl implements PageService {
 
     private final PageRepository pageRepository;
     private final AccountService accountService;
+    private final ModelMapper mapper;
 
-    public PageServiceImpl(PageRepository pageRepository, AccountService accountService) {
+    public PageServiceImpl(PageRepository pageRepository, AccountService accountService, ModelMapper mapper) {
         this.pageRepository = pageRepository;
         this.accountService = accountService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -48,78 +59,148 @@ public class PageServiceImpl implements PageService {
         log.info("Verifying if user is authenticated.");
 
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var account = accountService.findByEmail(userDetails.getUsername());
+        var account = this.accountService.findByEmail(userDetails.getUsername());
 
         log.info("Verifying if slug {} already exists.", createPageRequest.getSlug());
 
         this.pageRepository.findBySlug(createPageRequest.getSlug())
                 .ifPresent(page -> {
                     throw new RuleViolationException(
-                            new Issue(IssueEnum.ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
+                            new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, createPageRequest.getSlug()))
                     );
                 });
 
         log.info("Verifying if obligatory fields are missing. ");
 
-        setDefaultValues(createPageRequest);
+        this.setDefaultValues(createPageRequest);
 
         log.info("Validating background type.");
 
-        validateBackgroundType(createPageRequest);
+        this.validateBackgroundType(createPageRequest);
 
-        var page = Page
-                .builder()
-                .withAccount(account)
-                .withSlug(createPageRequest.getSlug())
-                .withTitle(createPageRequest.getTitle())
-                .withDescription(createPageRequest.getDescription())
-                .withPhoto(createPageRequest.getPhoto())
-                .withFontColor(createPageRequest.getFontColor())
-                .withBackgroundType(createPageRequest.getBackgroundType())
-                .withBackgroundValue(createPageRequest.getBackgroundValue())
-                .withCreatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .withUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC))
-                .build();
+        var page = this.mapper.map(createPageRequest, Page.class);
+
+        page.setAccount(account);
+        page.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
         log.info("Starting saving page {} in database.", page.getSlug());
 
-        var pageSaved = pageRepository.save(page);
+        var pageSaved = this.pageRepository.save(page);
 
+        return this.mapper.map(pageSaved, PageResponse.class);
+    }
 
-        return PageResponse
-                .builder()
-                .withId(pageSaved.getId())
-                .withSlug(pageSaved.getSlug())
-                .withTitle(pageSaved.getTitle())
-                .withDescription(pageSaved.getDescription())
-                .withPhoto(pageSaved.getPhoto())
-                .withFontColor(pageSaved.getFontColor())
-                .withBackgroundType(pageSaved.getBackgroundType())
-                .withBackgroundValue(pageSaved.getBackgroundValue())
-                .withCreatedAt(pageSaved.getCreatedAt())
-                .withUpdatedAt(pageSaved.getUpdatedAt())
-                .build();
+    @Override
+    public PageResponse update(UpdatePageRequest updatePageRequest, Integer id) {
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
+
+        var page = this.findById(id);
+
+        this.validateAuthorizations(account, page);
+
+        this.validateSlug(updatePageRequest, page);
+
+        this.setEmptyFields(updatePageRequest, page);
+
+        this.mapper.map(updatePageRequest, page);
+
+        page.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+
+        log.info("Updating page {}", page.getSlug());
+
+        var pageUpdated = this.pageRepository.save(page);
+
+        return  this.mapper.map(pageUpdated, PageResponse.class);
+    }
+
+    private  void validateAuthorizations(Account account, Page page) {
+        log.info("Verifying user authorization to edit page {}", page.getSlug());
+
+        if(!account.getId().equals(page.getAccount().getId())){
+            throw new ForbidenException(
+                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getSlug()))
+            );
+        }
+    }
+
+    private  void setEmptyFields(UpdatePageRequest updatePageRequest, Page page) {
+        log.info("Verifying and setting empty fields");
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getTitle())){
+            updatePageRequest.setTitle(page.getTitle());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getDescription())){
+            updatePageRequest.setDescription(page.getDescription());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getPhoto())){
+            updatePageRequest.setPhoto(page.getPhoto());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getFontColor())){
+            updatePageRequest.setFontColor(page.getFontColor());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getBackgroundType())){
+            updatePageRequest.setBackgroundType(page.getBackgroundType());
+        }
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getBackgroundValue())){
+            updatePageRequest.setBackgroundValue(page.getBackgroundValue());
+        }
+    }
+
+    private void validateSlug(UpdatePageRequest updatePageRequest, Page page) {
+        log.info("Validating slug {}", updatePageRequest.getSlug());
+
+        if(ObjectUtils.isEmpty(updatePageRequest.getSlug())){
+            updatePageRequest.setSlug(page.getSlug());
+        }
+
+        if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  && this.slugExists(updatePageRequest)){
+            throw new RuleViolationException(
+                            new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
+        }
+    }
+
+    @Override
+    public Page findById(Integer id) {
+
+        log.info("Searching this page in database");
+
+        return this.pageRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
+                ));
+    }
+
+    private boolean slugExists(UpdatePageRequest updatePageRequest){
+        var slug = this.pageRepository.findBySlug(updatePageRequest.getSlug()).orElse(null);
+        return ObjectUtils.isNotEmpty(slug);
     }
 
     private void validateBackgroundType(CreatePageRequest createPageRequest) {
         if(!createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
                 !createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE)) {
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BACKGROUND_TYPE_ERROR)
             );
         }
 
         if(createPageRequest.getBackgroundType().equalsIgnoreCase(DEFAULT_PAGE_BACKGROUND_TYPE_COLOR) &&
                 !createPageRequest.getBackgroundValue().matches(HEX_VALIDATION_REGEX)){
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR)
             );
         }
 
         if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
                 !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
             throw new RuleViolationException(
-                    new Issue(IssueEnum.ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
+                    new Issue(ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
             );
         }
     }

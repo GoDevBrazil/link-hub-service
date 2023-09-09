@@ -5,7 +5,6 @@ import com.godev.linkhubservice.domain.vo.AccountResponse;
 import com.godev.linkhubservice.domain.vo.AuthRequest;
 import com.godev.linkhubservice.domain.vo.AuthResponse;
 import com.godev.linkhubservice.domain.vo.UpdateAccountRequest;
-import com.godev.linkhubservice.domain.vo.UpdateAccountResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,7 +36,7 @@ public interface AccountController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PostMapping(value = "/auth")
-    ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest authRequest);
+    ResponseEntity<AuthResponse> auth(@Valid @RequestBody AuthRequest authRequest);
 
     @Operation(description = "Edit an account")
     @ApiResponses(value = {
@@ -47,5 +46,5 @@ public interface AccountController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @PutMapping
-    ResponseEntity<UpdateAccountResponse> update(@RequestBody @Valid UpdateAccountRequest updateAccountRequest);
+    ResponseEntity<AccountResponse> update(@Valid @RequestBody UpdateAccountRequest updateAccountRequest);
 }

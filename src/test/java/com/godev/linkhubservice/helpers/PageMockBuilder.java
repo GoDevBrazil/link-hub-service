@@ -35,6 +35,11 @@ public class PageMockBuilder {
         this.page.setUpdatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
         var account = new Account();
         account.setId(1);
+        account.setName("Kibe");
+        account.setEmail("kibe@email.com");
+        account.setPassword("Kibe@1234");
+        account.setCreatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
+        account.setUpdatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
         this.page.setAccount(account);
 
         return this;

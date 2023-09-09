@@ -8,12 +8,15 @@ public class CreatePageRequestMockBuilder {
 
     private final CreatePageRequest createPageRequest;
 
-    public CreatePageRequestMockBuilder() { this.createPageRequest = new CreatePageRequest(); }
+    public CreatePageRequestMockBuilder() {
+        this.createPageRequest = new CreatePageRequest();
+    }
 
-    public static CreatePageRequestMockBuilder getBuilder(){ return new CreatePageRequestMockBuilder();}
+    public static CreatePageRequestMockBuilder getBuilder() {
+        return new CreatePageRequestMockBuilder();
+    }
 
     public CreatePageRequestMockBuilder mock() {
-
         this.createPageRequest.setSlug("Jean Law");
         this.createPageRequest.setTitle("O melhor tutor de tecnologia!");
         this.createPageRequest.setDescription("Ajuda os amigos de coração.");
