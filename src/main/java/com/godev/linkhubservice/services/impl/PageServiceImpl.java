@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
@@ -175,6 +178,21 @@ public class PageServiceImpl implements PageService {
                 .orElseThrow(() -> new ObjectNotFoundException(
                         new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
                 ));
+    }
+
+    @Override
+    public List<PageResponse> list() {
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
+
+        var page = this.pageRepository.findPagesByAccount(account);
+
+        var pageResponseList = this.mapper.map(page, PageResponse.class);
+
+        log.info("Page {}", page);
+
+
+        return List.of(pageResponseList);
     }
 
     private boolean slugExists(UpdatePageRequest updatePageRequest){
