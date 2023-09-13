@@ -26,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -37,6 +38,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -145,6 +147,39 @@ class PageControllerImplTest {
                         .content(objectMapper.writeValueAsString(updatePageRequest)).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+    }
+
+    @Test
+    @DisplayName("Should show a list from user pages")
+    void findPagesByAccountIdHappyPath() throws Exception{
+
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.findPagesByAccountId()).thenReturn(List.of(pageResponse));
+
+        mockMvc.perform(get("/page")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(pageResponse))));
+
+    }
+
+    @Test
+    @DisplayName("Should show a empty list from user pages")
+    void findPagesByAccountIdHappyPath2() throws Exception{
+
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.findPagesByAccountId()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/page")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(Collections.emptyList())));
+
     }
 
     private static Stream<Arguments> pageRequestsInvalidFormats(){
