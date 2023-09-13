@@ -50,9 +50,9 @@ public class PageControllerImpl implements PageController {
     }
 
     @Override
-    public ResponseEntity<List<PageResponse>> list() {
-        var list = pageService.list();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<PageResponse>> findPagesByAccountId() {
+        var userPages = pageService.findPagesByAccountId();
+        return ResponseEntity.ok().body(userPages);
     }
 
 }

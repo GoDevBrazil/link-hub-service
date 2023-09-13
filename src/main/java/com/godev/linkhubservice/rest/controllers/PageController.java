@@ -30,6 +30,6 @@ public interface PageController {
     ResponseEntity<PageResponse> update(@Valid @RequestBody UpdatePageRequest updatePageRequest, @PathVariable Integer id);
 
     @GetMapping
-    ResponseEntity<List<PageResponse>> list();
+    ResponseEntity<List<PageResponse>> findPagesByAccountId();
 
 }

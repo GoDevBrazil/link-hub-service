@@ -13,7 +13,7 @@ public interface PageService {
 
     PageResponse update(UpdatePageRequest updatePageRequest, Integer id);
 
-    public Page findById(Integer id);
+    Page findById(Integer id);
 
-    List<PageResponse> list();
+    List<PageResponse> findPagesByAccountId();
 }
