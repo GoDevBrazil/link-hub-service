@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/page")
 @Slf4j
@@ -46,4 +48,11 @@ public class PageControllerImpl implements PageController {
 
         return ResponseEntity.ok(pageResponse);
     }
+
+    @Override
+    public ResponseEntity<List<PageResponse>> findPagesByAccountId() {
+        var userPages = pageService.findPagesByAccountId();
+        return ResponseEntity.ok().body(userPages);
+    }
+
 }

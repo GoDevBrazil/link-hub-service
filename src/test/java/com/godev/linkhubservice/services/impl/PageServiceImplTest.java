@@ -28,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -521,5 +522,37 @@ class PageServiceImplTest {
         Assertions.assertEquals(OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(ID_NOT_FOUND_ERROR, 1)),
                 objectNotFoundException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should show a list from user pages")
+    void findPagesByAccountIdHappyPatch(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findPagesByAccount_Id(this.mockedAccount.getId())).thenReturn(List.of(this.mockedPageSaved));
+
+        //action
+        final var pageResponse = this.pageService.findPagesByAccountId();
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findPagesByAccount_Id(this.mockedAccount.getId());
+    }
+
+    @Test
+    @DisplayName("Should show a empty list from user pages")
+    void findPagesByAccountIdHappyPatchEmptyList(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findPagesByAccount_Id(this.mockedAccount.getId())).thenReturn(Collections.emptyList());
+
+        //action
+        final var pageResponse = this.pageService.findPagesByAccountId();
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findPagesByAccount_Id(this.mockedAccount.getId());
     }
 }
