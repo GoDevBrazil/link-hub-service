@@ -168,7 +168,7 @@ class PageControllerImplTest {
 
     @Test
     @DisplayName("Should show a empty list from user pages")
-    void findPagesByAccountIdHappyPath2() throws Exception{
+    void findPagesByAccountIdHappyPathEmptyList() throws Exception{
 
         final var bearerToken = "Bearer kibe";
 

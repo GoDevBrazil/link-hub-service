@@ -116,6 +116,27 @@ public class PageServiceImpl implements PageService {
         return  this.mapper.map(pageUpdated, PageResponse.class);
     }
 
+    @Override
+    public Page findById(Integer id) {
+
+        log.info("Searching this page in database");
+
+        return this.pageRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
+                ));
+    }
+
+    @Override
+    public List<PageResponse> findPagesByAccountId() {
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
+
+        var pageList = this.pageRepository.findPagesByAccount_Id(account.getId());
+
+        return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
+    }
+
     private  void validateAuthorizations(Account account, Page page) {
         log.info("Verifying user authorization to edit page {}", page.getSlug());
 
@@ -163,29 +184,8 @@ public class PageServiceImpl implements PageService {
 
         if(!updatePageRequest.getSlug().equalsIgnoreCase(page.getSlug())  && this.slugExists(updatePageRequest)){
             throw new RuleViolationException(
-                            new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
+                    new Issue(ARGUMENT_NOT_VALID, String.format(SLUG_EXISTS_ERROR, updatePageRequest.getSlug())));
         }
-    }
-
-    @Override
-    public Page findById(Integer id) {
-
-        log.info("Searching this page in database");
-
-        return this.pageRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException(
-                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
-                ));
-    }
-
-    @Override
-    public List<PageResponse> findPagesByAccountId() {
-        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var account = this.accountService.findByEmail(userDetails.getUsername());
-
-        var pageList = this.pageRepository.findPagesByAccount_Id(account.getId());
-
-        return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
     }
 
     private boolean slugExists(UpdatePageRequest updatePageRequest){
