@@ -15,6 +15,6 @@ public class IssueDetails {
     public static final String  EMAIL_NOT_FOUND_ERROR = "Conta com o email '%s' não encontrada.";
     public static final String  ID_NOT_FOUND_ERROR = "Página com o ID '%s' não encontrada.";
 
-    public static final String  USER_NOT_ALLOWED = "Usuário não autorizado a editar a página %s.";
+    public static final String  USER_NOT_ALLOWED = "Usuário não autorizado a editar a página de id %s.";
 
 }

@@ -97,7 +97,7 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = this.accountService.findByEmail(userDetails.getUsername());
 
-        var page = this.findById(id);
+        var page = this.findPageById(id);
 
         this.validateAuthorizations(account, page);
 
@@ -117,14 +117,16 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public Page findById(Integer id) {
+    public PageResponse findById(Integer id) {
 
-        log.info("Searching this page in database");
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
 
-        return this.pageRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException(
-                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
-                ));
+        var page = this.findPageById(id);
+
+        this.validateAuthorizations(account, page);
+
+        return this.mapper.map(page, PageResponse.class);
     }
 
     @Override
@@ -142,9 +144,19 @@ public class PageServiceImpl implements PageService {
 
         if(!account.getId().equals(page.getAccount().getId())){
             throw new ForbidenException(
-                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getSlug()))
+                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getId()))
             );
         }
+    }
+
+    private Page findPageById(Integer id) {
+
+        log.info("Searching this page in database");
+
+        return this.pageRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
+                ));
     }
 
     private  void setEmptyFields(UpdatePageRequest updatePageRequest, Page page) {

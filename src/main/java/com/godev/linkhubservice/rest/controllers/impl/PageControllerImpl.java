@@ -55,4 +55,12 @@ public class PageControllerImpl implements PageController {
         return ResponseEntity.ok().body(userPages);
     }
 
+    @Override
+    public ResponseEntity<PageResponse> findById(Integer id) {
+
+        var pageResponse = pageService.findById(id);
+
+        return ResponseEntity.ok(pageResponse);
+    }
+
 }

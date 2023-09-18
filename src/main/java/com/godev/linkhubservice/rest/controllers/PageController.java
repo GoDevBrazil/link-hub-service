@@ -47,4 +47,7 @@ public interface PageController {
     @GetMapping
     ResponseEntity<List<PageResponse>> findPagesByAccountId();
 
+    @GetMapping(value = "/{id}")
+    ResponseEntity<PageResponse> findById(@PathVariable Integer id);
+
 }
