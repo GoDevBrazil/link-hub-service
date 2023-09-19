@@ -1,6 +1,6 @@
 package com.godev.linkhubservice.services.impl;
 
-import com.godev.linkhubservice.domain.exceptions.ForbidenException;
+import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
@@ -43,7 +43,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVA
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
-import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -333,13 +333,13 @@ class PageServiceImplTest {
         when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
 
         //action
-        ForbidenException forbidenException = Assertions.assertThrows(ForbidenException.class,
+        ForbiddenException forbiddenException = Assertions.assertThrows(ForbiddenException.class,
                 () -> this.pageService.update(this.mockedUpdatePageRequest, 1));
 
         //assertions
-        Assertions.assertEquals(FORBIDEN.getMessage(), forbidenException.getIssue().getMessage());
+        Assertions.assertEquals(FORBIDDEN.getMessage(), forbiddenException.getIssue().getMessage());
         Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getSlug())),
-                forbidenException.getIssue().getDetails());
+                forbiddenException.getIssue().getDetails());
     }
 
     @Test

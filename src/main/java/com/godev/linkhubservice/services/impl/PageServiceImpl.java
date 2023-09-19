@@ -1,6 +1,6 @@
 package com.godev.linkhubservice.services.impl;
 
-import com.godev.linkhubservice.domain.exceptions.ForbidenException;
+import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
@@ -37,7 +37,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVA
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
-import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
@@ -143,8 +143,8 @@ public class PageServiceImpl implements PageService {
         log.info("Verifying user authorization to edit page {}", page.getSlug());
 
         if(!account.getId().equals(page.getAccount().getId())){
-            throw new ForbidenException(
-                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getId()))
+            throw new ForbiddenException(
+                    new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, page.getId()))
             );
         }
     }

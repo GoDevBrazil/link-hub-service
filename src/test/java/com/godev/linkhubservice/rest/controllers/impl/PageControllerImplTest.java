@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
@@ -38,6 +39,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -180,6 +182,38 @@ class PageControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Collections.emptyList())));
 
+    }
+
+    @Test
+    @DisplayName("Should show a page response from user")
+    void findByIdHappyPath() throws Exception{
+
+        final var pageResponse = PageResponseMockBuilder.getBuilder().mock().build();
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.when(this.pageService.findById(1)).thenReturn(pageResponse);
+
+        mockMvc.perform(get("/page/1")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageResponse)));
+
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    void findByIdForbidden() throws Exception {
+
+        final var bearerToken = "Bearer kibe";
+
+//        Mockito.when(this.pageService.findById(2)).thenReturn();
+
+        mockMvc.perform(get("/page/2")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isForbidden())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 2)))));
     }
 
     private static Stream<Arguments> pageRequestsInvalidFormats(){
