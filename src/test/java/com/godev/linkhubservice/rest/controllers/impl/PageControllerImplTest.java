@@ -2,23 +2,23 @@ package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.enums.PageFields;
+import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
-import com.godev.linkhubservice.domain.repository.AccountRepository;
-import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
-import com.godev.linkhubservice.helpers.*;
+import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
+import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
+import com.godev.linkhubservice.helpers.UpdatePageRequestMockBuilder;
 import com.godev.linkhubservice.security.jwt.JwtService;
-import com.godev.linkhubservice.services.PageService;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
+import com.godev.linkhubservice.services.impl.PageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,22 +29,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_OR_HEX_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.*;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,19 +50,13 @@ class PageControllerImplTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private PageService pageService;
+    private PageServiceImpl pageService;
 
     @MockBean
     private AccountServiceImpl accountService;
 
     @MockBean
     private JwtService jwtService;
-
-    @MockBean
-    private PageRepository pageRepository;
-
-    @MockBean
-    private AccountRepository accountRepository;
 
     @BeforeEach
     void setup(){
@@ -201,7 +186,7 @@ class PageControllerImplTest {
 
         Mockito.when(this.pageService.findById(1)).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/page/1")
+        mockMvc.perform(get("/page/{id}", 1)
                         .contentType("application/json")
                         .header("Authorization", bearerToken))
                 .andExpect(status().isOk())
@@ -213,19 +198,16 @@ class PageControllerImplTest {
     @DisplayName("Should throw ForbiddenException when page id is of other user")
     void findByIdForbidden() throws Exception {
 
-        final var page = PageMockBuilder.getBuilder().mock().withId().withAccountId(2).build();
-        final var account = AccountMockBuilder.getBuilder().mock().withId().build();
         final var bearerToken = "Bearer kibe";
+        final var exception = new ForbiddenException(new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 1)));
 
-        Mockito.when(this.accountService.findByEmail("kibe@email.com")).thenReturn(account);
-        Mockito.when(this.pageService.findPageById(1)).thenReturn(page);
-        Mockito.when(this.pageService.validateAuthorizations(account, page));
+        Mockito.when(this.pageService.findById(1)).thenThrow(exception);
 
         mockMvc.perform(get("/page/1")
                         .contentType("application/json")
                         .header("Authorization", bearerToken))
                 .andExpect(status().isForbidden())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 2)))));
+                .andExpect(content().json(objectMapper.writeValueAsString(exception.getIssue())));
     }
 
     private static Stream<Arguments> pageRequestsInvalidFormats(){

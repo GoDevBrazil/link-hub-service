@@ -140,7 +140,7 @@ public class PageServiceImpl implements PageService {
         return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
     }
 
-    public void validateAuthorizations(Account account, Page page) {
+    private void validateAuthorizations(Account account, Page page) {
         log.info("Verifying user authorization to edit page {}", page.getSlug());
 
         if(!Objects.equals(account.getId(), page.getAccount().getId())){
@@ -150,7 +150,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    public Page findPageById(Integer id) {
+    private Page findPageById(Integer id) {
 
         log.info("Searching this page in database");
 
