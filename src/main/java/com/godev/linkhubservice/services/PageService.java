@@ -1,5 +1,7 @@
 package com.godev.linkhubservice.services;
 
+import com.godev.linkhubservice.domain.models.Account;
+import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
@@ -14,5 +16,9 @@ public interface PageService {
 
     PageResponse findById(Integer id);
 
+    Page findPageById(Integer id);
+
     List<PageResponse> findPagesByAccountId();
+
+    void validateAuthorizations(Account account, Page page);
 }

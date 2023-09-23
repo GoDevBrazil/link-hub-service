@@ -51,6 +51,18 @@ public class PageMockBuilder {
 
         return this;
     }
+    public PageMockBuilder withAccountId(Integer id) {
+        var account = new Account();
+        account.setId(id);
+        account.setName("Kibe");
+        account.setEmail("kibe@email.com");
+        account.setPassword("Kibe@1234");
+        account.setCreatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
+        account.setUpdatedAt(OffsetDateTime.parse("2023-06-09T15:20:00Z"));
+        this.page.setAccount(account);
+
+        return this;
+    }
     public PageMockBuilder withDefaultPhoto() {
 
         this.page.setPhoto(DEFAULT_PAGE_PHOTO);

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
@@ -139,17 +140,17 @@ public class PageServiceImpl implements PageService {
         return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
     }
 
-    private  void validateAuthorizations(Account account, Page page) {
+    public void validateAuthorizations(Account account, Page page) {
         log.info("Verifying user authorization to edit page {}", page.getSlug());
 
-        if(!account.getId().equals(page.getAccount().getId())){
+        if(!Objects.equals(account.getId(), page.getAccount().getId())){
             throw new ForbiddenException(
                     new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, page.getId()))
             );
         }
     }
 
-    private Page findPageById(Integer id) {
+    public Page findPageById(Integer id) {
 
         log.info("Searching this page in database");
 

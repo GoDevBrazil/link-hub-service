@@ -3,12 +3,12 @@ package com.godev.linkhubservice.rest.controllers.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.enums.PageFields;
 import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.repository.AccountRepository;
+import com.godev.linkhubservice.domain.repository.PageRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
-import com.godev.linkhubservice.helpers.CreatePageRequestMockBuilder;
-import com.godev.linkhubservice.helpers.PageResponseMockBuilder;
-import com.godev.linkhubservice.helpers.UpdatePageRequestMockBuilder;
+import com.godev.linkhubservice.helpers.*;
 import com.godev.linkhubservice.security.jwt.JwtService;
 import com.godev.linkhubservice.services.PageService;
 import com.godev.linkhubservice.services.impl.AccountServiceImpl;
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
@@ -64,6 +66,12 @@ class PageControllerImplTest {
 
     @MockBean
     private JwtService jwtService;
+
+    @MockBean
+    private PageRepository pageRepository;
+
+    @MockBean
+    private AccountRepository accountRepository;
 
     @BeforeEach
     void setup(){
@@ -205,11 +213,15 @@ class PageControllerImplTest {
     @DisplayName("Should throw ForbiddenException when page id is of other user")
     void findByIdForbidden() throws Exception {
 
+        final var page = PageMockBuilder.getBuilder().mock().withId().withAccountId(2).build();
+        final var account = AccountMockBuilder.getBuilder().mock().withId().build();
         final var bearerToken = "Bearer kibe";
 
-//        Mockito.when(this.pageService.findById(2)).thenReturn();
+        Mockito.when(this.accountService.findByEmail("kibe@email.com")).thenReturn(account);
+        Mockito.when(this.pageService.findPageById(1)).thenReturn(page);
+        Mockito.when(this.pageService.validateAuthorizations(account, page));
 
-        mockMvc.perform(get("/page/2")
+        mockMvc.perform(get("/page/1")
                         .contentType("application/json")
                         .header("Authorization", bearerToken))
                 .andExpect(status().isForbidden())
