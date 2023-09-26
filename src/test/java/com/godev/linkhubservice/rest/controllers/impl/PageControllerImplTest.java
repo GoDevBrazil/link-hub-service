@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godev.linkhubservice.domain.enums.PageFields;
 import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
+import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
@@ -31,10 +32,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUND_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.*;
-import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
-import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -199,7 +200,8 @@ class PageControllerImplTest {
     void findByIdForbidden() throws Exception {
 
         final var bearerToken = "Bearer kibe";
-        final var exception = new ForbiddenException(new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 1)));
+        final var exception = new ForbiddenException(
+                new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 1)));
 
         Mockito.when(this.pageService.findById(1)).thenThrow(exception);
 
@@ -207,6 +209,23 @@ class PageControllerImplTest {
                         .contentType("application/json")
                         .header("Authorization", bearerToken))
                 .andExpect(status().isForbidden())
+                .andExpect(content().json(objectMapper.writeValueAsString(exception.getIssue())));
+    }
+
+    @Test
+    @DisplayName("Should throw ObjectNotFoundException when page id is not found")
+    void findByIdNotFound() throws Exception {
+
+        final var bearerToken = "Bearer kibe";
+        final var exception = new ObjectNotFoundException(
+                new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, 1)));
+
+        Mockito.when(this.pageService.findById(1)).thenThrow(exception);
+
+        mockMvc.perform(get("/page/1")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNotFound())
                 .andExpect(content().json(objectMapper.writeValueAsString(exception.getIssue())));
     }
 
