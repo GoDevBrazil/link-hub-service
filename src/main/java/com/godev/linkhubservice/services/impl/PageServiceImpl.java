@@ -141,7 +141,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private void validateAuthorizations(Account account, Page page) {
-        log.info("Verifying user authorization to edit page {}", page.getSlug());
+        log.info("Verifying user authorization to edit page with id {}", page.getId());
 
         if(!Objects.equals(account.getId(), page.getAccount().getId())){
             throw new ForbiddenException(

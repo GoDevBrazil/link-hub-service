@@ -555,4 +555,56 @@ class PageServiceImplTest {
         verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
         verify(this.pageRepository, times(1)).findPagesByAccount_Id(this.mockedAccount.getId());
     }
+
+    @Test
+    @DisplayName("Should show a page response from user")
+    void findByIdHappyPatch(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+
+        //action
+        final var pageResponse = this.pageService.findById(1);
+
+        //assertions
+        Assertions.assertNotNull(pageResponse);
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    void findByIdForbidden(){
+        //arrange
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withAccountId(2).build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+
+        //action
+        ForbiddenException forbiddenException = Assertions.assertThrows(ForbiddenException.class,
+                () -> this.pageService.findById(1));
+
+        //assertions
+        Assertions.assertEquals(FORBIDDEN.getMessage(), forbiddenException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getId())),
+                forbiddenException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    void findByIdNotFound(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.empty());
+
+        //action
+        ObjectNotFoundException objectNotFoundException = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> this.pageService.findById(1));
+
+        //assertions
+        Assertions.assertEquals(OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(ID_NOT_FOUND_ERROR, 1)),
+                objectNotFoundException.getIssue().getDetails());
+    }
 }
