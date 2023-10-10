@@ -338,7 +338,7 @@ class PageServiceImplTest {
 
         //assertions
         Assertions.assertEquals(FORBIDDEN.getMessage(), forbiddenException.getIssue().getMessage());
-        Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getSlug())),
+        Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getId())),
                 forbiddenException.getIssue().getDetails());
     }
 
@@ -592,7 +592,7 @@ class PageServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    @DisplayName("Should throw ObjectNotFoundException when page not exists")
     void findByIdNotFound(){
         //arrange
         when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);

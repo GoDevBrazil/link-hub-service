@@ -71,6 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Issue handlerForbidenException(ForbiddenException e) {
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 }

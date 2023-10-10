@@ -42,11 +42,17 @@ public interface PageController {
 
     @Operation(description = "List all pages of an user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Return an user pages list"),
+            @ApiResponse(responseCode = "200", description = "Return an user pages list")
     })
     @GetMapping
     ResponseEntity<List<PageResponse>> findPagesByAccountId();
 
+    @Operation(description = "Get a page of an user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return an user page"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
     @GetMapping(value = "/{id}")
     ResponseEntity<PageResponse> findById(@PathVariable Integer id);
 

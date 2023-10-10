@@ -135,6 +135,8 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = this.accountService.findByEmail(userDetails.getUsername());
 
+        log.info("Getting pages of account id {} ", account.getId());
+
         var pageList = this.pageRepository.findPagesByAccount_Id(account.getId());
 
         return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
