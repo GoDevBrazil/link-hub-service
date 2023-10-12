@@ -40,7 +40,7 @@ public class CreatePageRequest {
     @Length(min = 20, max = 200, message = DESCRIPTION_LENGTH_ERROR)
     private String description;
 
-    @Schema(name = "photo", defaultValue = "default.png", description = "A photo of the page")
+    @Schema(name = "photo", defaultValue = "https://i.imgur.com/t7rv6OF.png", description = "A photo of the page")
     @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_FORMAT_ERROR)
     private String photo;
 
