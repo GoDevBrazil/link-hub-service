@@ -1,7 +1,7 @@
 package com.godev.linkhubservice.rest.exceptions;
 
 import com.godev.linkhubservice.domain.exceptions.BadRequestException;
-import com.godev.linkhubservice.domain.exceptions.ForbidenException;
+import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.InvalidJwtException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.IssueEnum;
@@ -68,9 +68,10 @@ public class GlobalExceptionHandler {
         return e.getIssue();
     }
 
-    @ExceptionHandler(ForbidenException.class)
+    @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Issue handlerForbidenException(ForbidenException e) {
+    public Issue handlerForbidenException(ForbiddenException e) {
+        log.error(e.getIssue().toString());
         return e.getIssue();
     }
 }

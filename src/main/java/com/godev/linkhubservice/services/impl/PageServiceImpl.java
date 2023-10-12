@@ -1,6 +1,6 @@
 package com.godev.linkhubservice.services.impl;
 
-import com.godev.linkhubservice.domain.exceptions.ForbidenException;
+import com.godev.linkhubservice.domain.exceptions.ForbiddenException;
 import com.godev.linkhubservice.domain.exceptions.Issue;
 import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_TYPE_COLOR;
 import static com.godev.linkhubservice.domain.constants.DatabaseValuesConstants.DEFAULT_PAGE_BACKGROUND_VALUE;
@@ -37,7 +38,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVA
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
-import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDEN;
+import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 
 @Service
@@ -97,7 +98,7 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = this.accountService.findByEmail(userDetails.getUsername());
 
-        var page = this.findById(id);
+        var page = this.findPageById(id);
 
         this.validateAuthorizations(account, page);
 
@@ -117,14 +118,16 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public Page findById(Integer id) {
+    public PageResponse findById(Integer id) {
 
-        log.info("Searching this page in database");
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
 
-        return this.pageRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException(
-                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
-                ));
+        var page = this.findPageById(id);
+
+        this.validateAuthorizations(account, page);
+
+        return this.mapper.map(page, PageResponse.class);
     }
 
     @Override
@@ -132,19 +135,31 @@ public class PageServiceImpl implements PageService {
         var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var account = this.accountService.findByEmail(userDetails.getUsername());
 
+        log.info("Getting pages of account id {} ", account.getId());
+
         var pageList = this.pageRepository.findPagesByAccount_Id(account.getId());
 
         return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
     }
 
-    private  void validateAuthorizations(Account account, Page page) {
-        log.info("Verifying user authorization to edit page {}", page.getSlug());
+    private void validateAuthorizations(Account account, Page page) {
+        log.info("Verifying user authorization to edit page with id {}", page.getId());
 
-        if(!account.getId().equals(page.getAccount().getId())){
-            throw new ForbidenException(
-                    new Issue(FORBIDEN, String.format(USER_NOT_ALLOWED, page.getSlug()))
+        if(!Objects.equals(account.getId(), page.getAccount().getId())){
+            throw new ForbiddenException(
+                    new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, page.getId()))
             );
         }
+    }
+
+    private Page findPageById(Integer id) {
+
+        log.info("Searching this page in database");
+
+        return this.pageRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, id))
+                ));
     }
 
     private  void setEmptyFields(UpdatePageRequest updatePageRequest, Page page) {

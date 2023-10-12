@@ -51,8 +51,26 @@ public class PageControllerImpl implements PageController {
 
     @Override
     public ResponseEntity<List<PageResponse>> findPagesByAccountId() {
+
+        log.info("Finding pages of this logged user");
+
         var userPages = pageService.findPagesByAccountId();
+
+        log.info("Listing pages of this logged user");
+
         return ResponseEntity.ok().body(userPages);
+    }
+
+    @Override
+    public ResponseEntity<PageResponse> findById(Integer id) {
+
+        log.info("Finding page with id {}", id);
+
+        var pageResponse = pageService.findById(id);
+
+        log.info("Returning page");
+
+        return ResponseEntity.ok(pageResponse);
     }
 
 }

@@ -33,11 +33,11 @@ public class UpdatePageRequest {
     @Length(min = 4, max = 100, message = TITLE_LENGTH_ERROR)
     private String title;
 
-    @Schema(name = "description", defaultValue = "Link hub page description.", description = "A description of the page")
+    @Schema(name = "description", defaultValue = "Link Hub page description.", description = "A description of the page")
     @Length(min = 20, max = 200, message = DESCRIPTION_LENGTH_ERROR)
     private String description;
 
-    @Schema(name = "photo", defaultValue = "Link hub page photo.", description = "A photo of the page")
+    @Schema(name = "photo", defaultValue = "https://i.imgur.com/t7rv6OF.png", description = "A photo of the page")
     @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_FORMAT_ERROR)
     private String photo;
 
@@ -45,7 +45,7 @@ public class UpdatePageRequest {
     @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
     private String fontColor;
 
-    @Schema(name = "background type", defaultValue = "color", description = "A background type of the page")
+    @Schema(name = "background type", defaultValue = "COLOR", description = "A background type of the page")
     private String backgroundType;
 
     @Schema(name = "background value", defaultValue = "#F4F4F4", description = "A background color of the page")
