@@ -73,4 +73,16 @@ public class PageControllerImpl implements PageController {
         return ResponseEntity.ok(pageResponse);
     }
 
+    @Override
+    public ResponseEntity<Void> delete(Integer id) {
+
+        log.info("Initialing delete process verifications");
+
+        this.pageService.delete(id);
+
+        log.info("Page with id {} deleted", id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,5 +56,14 @@ public interface PageController {
     })
     @GetMapping(value = "/{id}")
     ResponseEntity<PageResponse> findById(@PathVariable Integer id);
+
+    @Operation(description = "Delete a page of an user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
+    @DeleteMapping(value = "/{id}")
+    ResponseEntity<Void> delete(@PathVariable Integer id);
 
 }
