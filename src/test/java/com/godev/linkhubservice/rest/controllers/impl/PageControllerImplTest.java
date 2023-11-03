@@ -44,6 +44,7 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.URL_
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_VALID;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -233,6 +234,53 @@ class PageControllerImplTest {
         Mockito.when(this.pageService.findById(1)).thenThrow(exception);
 
         mockMvc.perform(get("/page/1")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(objectMapper.writeValueAsString(exception.getIssue())));
+    }
+
+    @Test
+    @DisplayName("Should delete a page from user")
+    void deleteHappyPath() throws Exception{
+        final var bearerToken = "Bearer kibe";
+
+        Mockito.doNothing().when(this.pageService).delete(1);
+
+        mockMvc.perform(delete("/page/{id}", 1)
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    void deleteForbidden() throws Exception {
+
+        final var bearerToken = "Bearer kibe";
+        final var exception = new ForbiddenException(
+                new Issue(FORBIDDEN, String.format(USER_NOT_ALLOWED, 1)));
+
+        Mockito.doThrow(exception).when(this.pageService).delete(1);
+
+        mockMvc.perform(delete("/page/1")
+                        .contentType("application/json")
+                        .header("Authorization", bearerToken))
+                .andExpect(status().isForbidden())
+                .andExpect(content().json(objectMapper.writeValueAsString(exception.getIssue())));
+    }
+
+    @Test
+    @DisplayName("Should throw ObjectNotFoundException when page id is not found")
+    void deleteNotFound() throws Exception {
+
+        final var bearerToken = "Bearer kibe";
+        final var exception = new ObjectNotFoundException(
+                new Issue(OBJECT_NOT_FOUND, String.format(ID_NOT_FOUND_ERROR, 1)));
+
+        Mockito.doThrow(exception).when(this.pageService).delete(1);
+
+        mockMvc.perform(delete("/page/1")
                         .contentType("application/json")
                         .header("Authorization", bearerToken))
                 .andExpect(status().isNotFound())
