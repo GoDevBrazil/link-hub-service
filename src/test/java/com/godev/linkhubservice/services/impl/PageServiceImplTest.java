@@ -46,6 +46,7 @@ import static com.godev.linkhubservice.domain.exceptions.IssueEnum.ARGUMENT_NOT_
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.FORBIDDEN;
 import static com.godev.linkhubservice.domain.exceptions.IssueEnum.OBJECT_NOT_FOUND;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -601,6 +602,59 @@ class PageServiceImplTest {
         //action
         ObjectNotFoundException objectNotFoundException = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> this.pageService.findById(1));
+
+        //assertions
+        Assertions.assertEquals(OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(ID_NOT_FOUND_ERROR, 1)),
+                objectNotFoundException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should delete a page from user")
+    void deleteHappyPatch(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+        doNothing().when(this.pageRepository).delete(this.mockedPageSaved);
+
+        //action
+        this.pageService.delete(1);
+
+        //assertions
+        verify(this.accountService, times(1)).findByEmail(this.userDetails.getUsername());
+        verify(this.pageRepository, times(1)).findById(1);
+        verify(this.pageRepository, times(1)).delete(this.mockedPageSaved);
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when page id is of other user")
+    void deleteForbidden(){
+        //arrange
+        this.mockedPageSaved = PageMockBuilder.getBuilder().mock().withId().withAccountId(2).build();
+
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.ofNullable(this.mockedPageSaved));
+
+        //action
+        ForbiddenException forbiddenException = Assertions.assertThrows(ForbiddenException.class,
+                () -> this.pageService.delete(1));
+
+        //assertions
+        Assertions.assertEquals(FORBIDDEN.getMessage(), forbiddenException.getIssue().getMessage());
+        Assertions.assertEquals(List.of(String.format(USER_NOT_ALLOWED, this.mockedPageSaved.getId())),
+                forbiddenException.getIssue().getDetails());
+    }
+
+    @Test
+    @DisplayName("Should throw ObjectNotFoundException when page not exists")
+    void deleteNotFound(){
+        //arrange
+        when(this.accountService.findByEmail(userDetails.getUsername())).thenReturn(this.mockedAccount);
+        when(this.pageRepository.findById(1)).thenReturn(Optional.empty());
+
+        //action
+        ObjectNotFoundException objectNotFoundException = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> this.pageService.delete(1));
 
         //assertions
         Assertions.assertEquals(OBJECT_NOT_FOUND.getMessage(), objectNotFoundException.getIssue().getMessage());

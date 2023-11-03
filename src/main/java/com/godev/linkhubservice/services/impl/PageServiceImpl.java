@@ -152,6 +152,8 @@ public class PageServiceImpl implements PageService {
 
         this.validateAuthorizations(account, page);
 
+        log.info("Deletion process in progress");
+
         this.pageRepository.delete(page);
     }
 
