@@ -142,6 +142,21 @@ public class PageServiceImpl implements PageService {
         return pageList.stream().map(page -> this.mapper.map(page, PageResponse.class)).toList();
     }
 
+    @Override
+    public void delete(Integer id) {
+
+        var userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var account = this.accountService.findByEmail(userDetails.getUsername());
+
+        var page = this.findPageById(id);
+
+        this.validateAuthorizations(account, page);
+
+        log.info("Deletion process in progress");
+
+        this.pageRepository.delete(page);
+    }
+
     private void validateAuthorizations(Account account, Page page) {
         log.info("Verifying user authorization to edit page with id {}", page.getId());
 

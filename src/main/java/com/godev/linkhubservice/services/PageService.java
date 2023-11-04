@@ -15,4 +15,6 @@ public interface PageService {
     PageResponse findById(Integer id);
 
     List<PageResponse> findPagesByAccountId();
+
+    void delete(Integer id);
 }
