@@ -1,0 +1,11 @@
+CREATE TABLE page_views (
+    id INTEGER(11) NOT NULL AUTO_INCREMENT,
+    date DATETIME NOT NULL,
+    total INTEGER(6) DEFAULT 0,
+    page_id INTEGER(11) NOT NULL,
+
+    PRIMARY KEY (id)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE page_views ADD CONSTRAINT fk_page FOREIGN KEY(page_id) REFERENCES pages(id);
