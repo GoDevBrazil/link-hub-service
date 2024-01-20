@@ -85,16 +85,4 @@ public class PageControllerImpl implements PageController {
         return ResponseEntity.noContent().build();
     }
 
-    @Override
-    public ResponseEntity<Void> pageViewCounter(String slug) {
-
-        log.info("Initialing PageView counter");
-
-        this.pageService.pageViewCounter(slug);
-
-        log.info("PageView with slug {} accounted", slug);
-
-        return ResponseEntity.noContent().build();
-    }
-
 }
