@@ -66,4 +66,11 @@ public interface PageController {
     @DeleteMapping(value = "/{id}")
     ResponseEntity<Void> delete(@PathVariable Integer id);
 
+    @Operation(description = "Page hit counter")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
+    @PostMapping(value = "/{slug}/view")
+    ResponseEntity<Void> pageViewCounter(@PathVariable String slug);
 }
