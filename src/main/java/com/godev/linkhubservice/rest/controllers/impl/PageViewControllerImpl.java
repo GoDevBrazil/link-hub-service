@@ -1,14 +1,11 @@
 package com.godev.linkhubservice.rest.controllers.impl;
 
-import com.godev.linkhubservice.domain.models.PageView;
 import com.godev.linkhubservice.rest.controllers.PageViewController;
 import com.godev.linkhubservice.services.PageViewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.OffsetDateTime;
 
 @RestController
 @RequestMapping(value = "/pageview")

@@ -30,4 +30,5 @@ public class ValidationConstants {
     public static final String  PASSWORD_REQUIRED_ERROR = "O campo senha é obrigatório!";
     public static final String  NAME_REQUIRED_ERROR = "O campo nome é obrigatório!";
     public static final String  SLUG_REQUIRED_ERROR = "O campo slug é obrigatório!";
+    public static final String  PAGE_ID_REQUIRED_ERROR = "O campo pageId é obrigatório!";
 }

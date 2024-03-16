@@ -2,6 +2,7 @@ package com.godev.linkhubservice.rest.controllers.impl;
 
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.domain.vo.PageViewRequest;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.rest.controllers.PageController;
 import com.godev.linkhubservice.services.PageService;
@@ -81,6 +82,19 @@ public class PageControllerImpl implements PageController {
         this.pageService.delete(id);
 
         log.info("Page with id {} deleted", id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> pageViewCounter(PageViewRequest pageViewRequest) {
+        log.info("Initialing PageView counter");
+
+        this.pageService.pageViewCounter(pageViewRequest);
+
+        log.info("PageView with id {} accounted", pageViewRequest.getPageId());
+
+        //TODO: return status 200 with date and total views
 
         return ResponseEntity.noContent().build();
     }
