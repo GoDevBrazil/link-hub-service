@@ -12,6 +12,7 @@ import com.godev.linkhubservice.domain.repository.PageViewRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.PageViewRequest;
+import com.godev.linkhubservice.domain.vo.PageViewResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
@@ -164,7 +165,7 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void pageViewCounter(PageViewRequest pageViewRequest) {
+    public PageViewResponse pageViewCounter(PageViewRequest pageViewRequest) {
 
         var page = this.findPageById(pageViewRequest.getPageId());
 
@@ -182,7 +183,9 @@ public class PageServiceImpl implements PageService {
             pageView.setTotal(pageView.getTotal()+1);
         }
 
-        this.pageViewRepository.save(pageView);
+        var pageViewSaved = this.pageViewRepository.save(pageView);
+
+        return this.mapper.map(pageViewSaved, PageViewResponse.class);
     }
 
     private void validateAuthorizations(Account account, Page page) {

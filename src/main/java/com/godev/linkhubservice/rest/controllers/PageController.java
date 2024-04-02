@@ -3,6 +3,7 @@ package com.godev.linkhubservice.rest.controllers;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
 import com.godev.linkhubservice.domain.vo.PageViewRequest;
+import com.godev.linkhubservice.domain.vo.PageViewResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -67,12 +68,12 @@ public interface PageController {
     @DeleteMapping(value = "/{id}")
     ResponseEntity<Void> delete(@PathVariable Integer id);
 
-    @Operation(description = "Register a page view")
+    @Operation(description = "Register or increments a page view")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "200", description = "Return date and total page views"),
             @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @PostMapping(value = "/view")
-    ResponseEntity<Void> pageViewCounter(@RequestBody PageViewRequest pageViewRequest);
+    ResponseEntity<PageViewResponse> pageViewCounter(@Valid @RequestBody PageViewRequest pageViewRequest);
 
 }
