@@ -6,6 +6,7 @@ import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.PageRepository;
+import com.godev.linkhubservice.domain.repository.PageViewRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.helpers.AccountMockBuilder;
@@ -58,6 +59,8 @@ class PageServiceImplTest {
     private PageRepository pageRepository;
     @Mock
     private AccountService accountService;
+    @Mock
+    private PageViewRepository pageViewRepository;
 
     private PageServiceImpl pageService;
 
@@ -77,7 +80,7 @@ class PageServiceImplTest {
 
     @BeforeEach
     void setup(){
-        this.pageService = new PageServiceImpl(pageRepository, accountService, new ModelMapper());
+        this.pageService = new PageServiceImpl(pageRepository, accountService, new ModelMapper(), pageViewRepository);
 
         Authentication authentication = Mockito.mock(Authentication.class);
         Mockito.when(authentication.getPrincipal()).thenReturn(this.userDetails);
