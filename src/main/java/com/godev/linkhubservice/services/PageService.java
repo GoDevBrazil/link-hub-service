@@ -2,6 +2,8 @@ package com.godev.linkhubservice.services;
 
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.domain.vo.PageViewRequest;
+import com.godev.linkhubservice.domain.vo.PageViewResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface PageService {
     List<PageResponse> findPagesByAccountId();
 
     void delete(Integer id);
+
+    PageViewResponse pageViewCounter(PageViewRequest pageViewRequest);
 }

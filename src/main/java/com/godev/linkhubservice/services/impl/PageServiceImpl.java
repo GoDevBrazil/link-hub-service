@@ -6,9 +6,13 @@ import com.godev.linkhubservice.domain.exceptions.ObjectNotFoundException;
 import com.godev.linkhubservice.domain.exceptions.RuleViolationException;
 import com.godev.linkhubservice.domain.models.Account;
 import com.godev.linkhubservice.domain.models.Page;
+import com.godev.linkhubservice.domain.models.PageView;
 import com.godev.linkhubservice.domain.repository.PageRepository;
+import com.godev.linkhubservice.domain.repository.PageViewRepository;
 import com.godev.linkhubservice.domain.vo.CreatePageRequest;
 import com.godev.linkhubservice.domain.vo.PageResponse;
+import com.godev.linkhubservice.domain.vo.PageViewRequest;
+import com.godev.linkhubservice.domain.vo.PageViewResponse;
 import com.godev.linkhubservice.domain.vo.UpdatePageRequest;
 import com.godev.linkhubservice.services.AccountService;
 import com.godev.linkhubservice.services.PageService;
@@ -19,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -48,11 +53,13 @@ public class PageServiceImpl implements PageService {
     private final PageRepository pageRepository;
     private final AccountService accountService;
     private final ModelMapper mapper;
+    private final PageViewRepository pageViewRepository;
 
-    public PageServiceImpl(PageRepository pageRepository, AccountService accountService, ModelMapper mapper) {
+    public PageServiceImpl(PageRepository pageRepository, AccountService accountService, ModelMapper mapper, PageViewRepository pageViewRepository) {
         this.pageRepository = pageRepository;
         this.accountService = accountService;
         this.mapper = mapper;
+        this.pageViewRepository = pageViewRepository;
     }
 
     @Override
@@ -155,6 +162,30 @@ public class PageServiceImpl implements PageService {
         log.info("Deletion process in progress");
 
         this.pageRepository.delete(page);
+    }
+
+    @Override
+    public PageViewResponse pageViewCounter(PageViewRequest pageViewRequest) {
+
+        var page = this.findPageById(pageViewRequest.getPageId());
+
+        var date = LocalDate.now().atTime(0, 0).atOffset(ZoneOffset.ofHours(0));
+
+        var pageView = this.pageViewRepository.findByPageIdAndDate(page, date).orElse(null);
+
+        if(ObjectUtils.isEmpty(pageView)){
+            pageView = PageView.builder()
+                    .withTotal(1)
+                    .withDate(date)
+                    .withPageId(page)
+                    .build();
+        }else {
+            pageView.setTotal(pageView.getTotal()+1);
+        }
+
+        var pageViewSaved = this.pageViewRepository.save(pageView);
+
+        return this.mapper.map(pageViewSaved, PageViewResponse.class);
     }
 
     private void validateAuthorizations(Account account, Page page) {
