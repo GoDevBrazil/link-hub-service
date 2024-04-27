@@ -32,7 +32,7 @@ public class CreatePageRequest {
     @NotBlank(message = SLUG_REQUIRED_ERROR)
     private String slug;
 
-    @Schema(name = "title", defaultValue = "Link Hub", description = "Title of the page.")
+    @Schema(name = "title", defaultValue = "Link Hub", description = "Page title.")
     @Length(min = 4, max = 100, message = TITLE_LENGTH_ERROR)
     private String title;
 
@@ -44,7 +44,7 @@ public class CreatePageRequest {
     @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_FORMAT_ERROR)
     private String photo;
 
-    @Schema(name = "font color", defaultValue = "#212121", description = "A photo of the page")
+    @Schema(name = "font color", defaultValue = "#212121", description = "Page font color")
     @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
     private String fontColor;
 
