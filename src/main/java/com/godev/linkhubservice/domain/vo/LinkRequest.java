@@ -4,18 +4,22 @@ package com.godev.linkhubservice.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_STATUS_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_TITLE_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.PAGE_ID_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
 
 @Data
@@ -43,7 +47,18 @@ public class LinkRequest {
     @NotBlank(message = HREF_REQUIRED_ERROR)
     private String href;
 
+    @Schema(name = "background color", defaultValue = "#cacaca", description = "A background color")
+    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
     private String backgroundColor;
+
+    @Schema(name = "text color", defaultValue = "#212121", description = "A text color")
+    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
     private String textColor;
+
+    @Schema(name = "border type", defaultValue = "square",description = "A border type")
     private String borderType;
+
+    @Schema(name = "pageId", defaultValue = "1", description = "Unique identification of page.")
+    @NotNull(message = PAGE_ID_REQUIRED_ERROR)
+    private Integer pageId;
 }
