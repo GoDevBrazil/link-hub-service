@@ -27,12 +27,12 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public LinkResponse create(LinkRequest linkRequest) {
 
-        var page = this.pageService.findById(linkRequest.getPageId());
+        this.pageService.findById(linkRequest.getPageId());
 
         var link = this.mapper.map(linkRequest, Link.class);
 
-        link.setPageId(page);
+        var linkSaved = this.linkRepository.save(link);
 
-        return null;
+        return this.mapper.map(linkSaved, LinkResponse.class);
     }
 }

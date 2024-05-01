@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .permitAll()
                     .requestMatchers(HttpMethod.POST, "/page/view")
                         .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/link")
+                        .permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .sessionManagement()

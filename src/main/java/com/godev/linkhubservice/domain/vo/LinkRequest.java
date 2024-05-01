@@ -15,7 +15,6 @@ import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALID
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_STATUS_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_TITLE_REQUIRED_ERROR;
@@ -29,11 +28,11 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITL
 public class LinkRequest {
 
     @Schema(name = "status", defaultValue = "false", description = "Enable or disable a link")
-    @NotBlank(message = LINK_STATUS_REQUIRED_ERROR)
+    @NotNull(message = LINK_STATUS_REQUIRED_ERROR)
     private Boolean status;
 
     @Schema(name = "link order", defaultValue = "0", description = "Arranges the order of links")
-    @Length(min = 1, max = 6, message = LINK_ORDER_LENGTH_ERROR)
+//    @Length(min = 1, max = 6, message = LINK_ORDER_LENGTH_ERROR)
     @NotNull(message = LINK_ORDER_REQUIRED_ERROR)
     private Integer linkOrder;
 
