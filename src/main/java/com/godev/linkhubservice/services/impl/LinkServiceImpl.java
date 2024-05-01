@@ -29,6 +29,10 @@ public class LinkServiceImpl implements LinkService {
 
         this.pageService.findById(linkRequest.getPageId());
 
+        this.mapper.typeMap(LinkRequest.class,Link.class).addMappings(mp -> {
+            mp.skip(Link::setId);
+        });
+
         var link = this.mapper.map(linkRequest, Link.class);
 
         var linkSaved = this.linkRepository.save(link);
