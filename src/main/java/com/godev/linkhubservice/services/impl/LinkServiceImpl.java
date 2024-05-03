@@ -1,6 +1,7 @@
 package com.godev.linkhubservice.services.impl;
 
 import com.godev.linkhubservice.domain.models.Link;
+import com.godev.linkhubservice.domain.models.Page;
 import com.godev.linkhubservice.domain.repository.LinkRepository;
 import com.godev.linkhubservice.domain.vo.LinkRequest;
 import com.godev.linkhubservice.domain.vo.LinkResponse;
@@ -9,6 +10,8 @@ import com.godev.linkhubservice.services.PageService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -33,7 +36,19 @@ public class LinkServiceImpl implements LinkService {
             mp.skip(Link::setId);
         });
 
+        if (linkRequest.getStatus() == null) {
+            linkRequest.setStatus(false);
+        }
+
         var link = this.mapper.map(linkRequest, Link.class);
+
+        var pageLinks = this.linkRepository.findLinksByPageId(link.getPageId());
+
+        if (pageLinks.isEmpty()) {
+            link.setLinkOrder(0);
+        } else {
+            link.setLinkOrder(pageLinks.size());
+        }
 
         var linkSaved = this.linkRepository.save(link);
 

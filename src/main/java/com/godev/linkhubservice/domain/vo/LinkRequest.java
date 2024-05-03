@@ -2,6 +2,7 @@ package com.godev.linkhubservice.domain.vo;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,8 +16,7 @@ import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALID
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_STATUS_REQUIRED_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_TITLE_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PAGE_ID_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
@@ -28,12 +28,10 @@ import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITL
 public class LinkRequest {
 
     @Schema(name = "status", defaultValue = "false", description = "Enable or disable a link")
-    @NotNull(message = LINK_STATUS_REQUIRED_ERROR)
     private Boolean status;
 
     @Schema(name = "link order", defaultValue = "0", description = "Arranges the order of links")
-//    @Length(min = 1, max = 6, message = LINK_ORDER_LENGTH_ERROR)
-    @NotNull(message = LINK_ORDER_REQUIRED_ERROR)
+    @Max(value = 999999, message = LINK_ORDER_LENGTH_ERROR)
     private Integer linkOrder;
 
     @Schema(name = "title", defaultValue = "The best link ever", description = "Link title")
@@ -42,7 +40,7 @@ public class LinkRequest {
     private String title;
 
     @Schema(name = "href", defaultValue = "https://www.google.com.br/logos/google.jpg", description = "A link")
-    @Length(min = 30, max = 100, message = HREF_LENGTH_ERROR)
+    @Length(min = 7, max = 100, message = HREF_LENGTH_ERROR)
     @NotBlank(message = HREF_REQUIRED_ERROR)
     private String href;
 
