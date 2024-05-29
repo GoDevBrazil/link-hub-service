@@ -13,9 +13,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.HREF_REQUIRED_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_TEXT_COLOR_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_ORDER_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.LINK_TITLE_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.PAGE_ID_REQUIRED_ERROR;
@@ -41,15 +44,16 @@ public class LinkRequest {
 
     @Schema(name = "href", defaultValue = "https://www.google.com.br/logos/google.jpg", description = "A link")
     @Length(min = 7, max = 100, message = HREF_LENGTH_ERROR)
+    @Pattern(regexp = URL_VALIDATION_REGEX, message = INVALID_URL_FORMAT_ERROR)
     @NotBlank(message = HREF_REQUIRED_ERROR)
     private String href;
 
     @Schema(name = "background color", defaultValue = "#cacaca", description = "A background color")
-    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
+    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_BACKGROUND_COLOR_FORMAT_ERROR)
     private String backgroundColor;
 
     @Schema(name = "text color", defaultValue = "#212121", description = "A text color")
-    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_FONT_COLOR_FORMAT_ERROR)
+    @Pattern(regexp = HEX_VALIDATION_REGEX, message = INVALID_TEXT_COLOR_FORMAT_ERROR)
     private String textColor;
 
     @Schema(name = "border type", defaultValue = "square",description = "A border type")

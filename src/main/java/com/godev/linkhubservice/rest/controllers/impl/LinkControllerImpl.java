@@ -22,7 +22,11 @@ public class LinkControllerImpl implements LinkController {
     @Override
     public ResponseEntity<LinkResponse> create(LinkRequest linkRequest) {
 
+        log.info("Starting create link {}", linkRequest.getHref());
+
         var linkResponse = linkService.create(linkRequest);
+
+        log.info("Link {} saved in database", linkRequest.getHref());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(linkResponse);
     }

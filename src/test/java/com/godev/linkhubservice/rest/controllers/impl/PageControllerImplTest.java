@@ -36,7 +36,7 @@ import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUN
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.DESCRIPTION_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_FONT_COLOR_FORMAT_ERROR;
-import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_URL_FORMAT_ERROR;
+import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_IMGUR_URL_FORMAT_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_LENGTH_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.SLUG_REQUIRED_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.TITLE_LENGTH_ERROR;
@@ -294,7 +294,7 @@ class PageControllerImplTest {
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR), PageFields.SLUG),
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTittle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR), PageFields.TITLE),
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR), PageFields.DESCRIPTION),
-                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidUrlFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR), PageFields.PHOTO),
+                Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidUrlFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_IMGUR_URL_FORMAT_ERROR), PageFields.PHOTO),
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidRgbFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
                 Arguments.of(CreatePageRequestMockBuilder.getBuilder().mock().withInvalidNameFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
@@ -307,7 +307,7 @@ class PageControllerImplTest {
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthSlug().build(), new Issue(ARGUMENT_NOT_VALID, SLUG_LENGTH_ERROR), PageFields.SLUG),
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthTitle().build(), new Issue(ARGUMENT_NOT_VALID, TITLE_LENGTH_ERROR), PageFields.TITLE),
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidLengthDescription().build(), new Issue(ARGUMENT_NOT_VALID, DESCRIPTION_LENGTH_ERROR), PageFields.DESCRIPTION),
-                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_URL_FORMAT_ERROR), PageFields.PHOTO),
+                Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatPhoto().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_IMGUR_URL_FORMAT_ERROR), PageFields.PHOTO),
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatFontColor().build(), new Issue(ARGUMENT_NOT_VALID, INVALID_FONT_COLOR_FORMAT_ERROR), PageFields.FONTCOLOR),
                 Arguments.of(UpdatePageRequestMockBuilder.getBuilder().mock().withInvalidFormatBackgroundValue().build(), new Issue(ARGUMENT_NOT_VALID, URL_OR_HEX_FORMAT_ERROR), PageFields.BACKGROUNDVALUE)
 

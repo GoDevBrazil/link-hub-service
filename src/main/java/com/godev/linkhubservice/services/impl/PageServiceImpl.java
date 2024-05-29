@@ -38,7 +38,7 @@ import static com.godev.linkhubservice.domain.constants.IssueDetails.ID_NOT_FOUN
 import static com.godev.linkhubservice.domain.constants.IssueDetails.SLUG_EXISTS_ERROR;
 import static com.godev.linkhubservice.domain.constants.IssueDetails.USER_NOT_ALLOWED;
 import static com.godev.linkhubservice.domain.constants.RegexConstants.HEX_VALIDATION_REGEX;
-import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_VALIDATION_REGEX;
+import static com.godev.linkhubservice.domain.constants.RegexConstants.URL_IMGUR_VALIDATION_REGEX;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BACKGROUND_TYPE_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_COLOR_ERROR;
 import static com.godev.linkhubservice.domain.constants.ValidationConstants.INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR;
@@ -270,7 +270,7 @@ public class PageServiceImpl implements PageService {
         }
 
         if(createPageRequest.getBackgroundType().equalsIgnoreCase(PAGE_BACKGROUND_TYPE_IMAGE) &&
-                !createPageRequest.getBackgroundValue().matches(URL_VALIDATION_REGEX)){
+                !createPageRequest.getBackgroundValue().matches(URL_IMGUR_VALIDATION_REGEX)){
             throw new RuleViolationException(
                     new Issue(ARGUMENT_NOT_VALID, INVALID_BG_VALUE_FOR_BG_TYPE_IMAGE_ERROR)
             );

@@ -10,4 +10,7 @@ public class DatabaseValuesConstants {
     public static final String DEFAULT_PAGE_BACKGROUND_TYPE_COLOR = "COLOR";
     public static final String DEFAULT_PAGE_BACKGROUND_VALUE = "#F4F4F4";
     public static final String PAGE_BACKGROUND_TYPE_IMAGE = "IMAGE";
+
+    public static final String DEFAULT_LINK_BORDER_TYPE_SQUARE = "SQUARE";
+    public static final String LINK_BORDER_TYPE_ROUNDED = "ROUNDED";
 }
